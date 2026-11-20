@@ -579,7 +579,7 @@ fromHash();
 // ---------------- Ryder Cup four-ball scoring ----------------
 const TEAM_CLS=["eu","us"];
 function defaultMatches(){
-  return { open:true, setup:false, net:true, teams:["Europe","USA"],
+  return { open:true, setup:false, net:true, count:1, teams:["Europe","USA"],
     m:[0,1].map(i=>({ players:[[`EU ${i*2+1}`,`EU ${i*2+2}`],[`US ${i*2+1}`,`US ${i*2+2}`]], hcp:[[18,18],[18,18]], scores:{} })) };
 }
 let RC = defaultMatches();
@@ -620,20 +620,21 @@ function matchStatus(match){
   else { const lead=diff>0?0:1; text=`${T[lead]} ${Math.abs(diff)} UP thru ${thru}${Math.abs(diff)===18-thru?" (dormie)":""}`; pts=lead===0?[1,0]:[0,1]; }
   return {text, pts, final: !!closed || thru===18, res, diff};
 }
+const ACT=()=>RC.m.slice(0, RC.count||1);
 const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""); };
 
 function renderRC(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole];
-  const st=RC.m.map(matchStatus);
+  const st=ACT().map(matchStatus);
   const tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
   const live=st.some(x=>!x.final && x.text!=="Not started");
-  let h=`<div class="rc-head" data-act="toggle"><b>Ryder Cup · Four-ball</b><span class="rc-score"><span class="eu">${RC.teams[0]} ${fmtPts(tot[0])}</span>–<span class="us">${fmtPts(tot[1])} ${RC.teams[1]}</span><span style="font-size:10px;font-weight:500;opacity:.8">${live?"live":""}</span><span class="chev">${RC.open?"▲":"▼"}</span></span></div>`;
+  let h=`<div class="rc-head" data-act="toggle"><b>${(RC.count||1)>1?"Ryder Cup · Four-ball":"Best ball · 2 v 2"}</b><span class="rc-score">${(RC.count||1)>1?`<span class="eu">${RC.teams[0]} ${fmtPts(tot[0])}</span>–<span class="us">${fmtPts(tot[1])} ${RC.teams[1]}</span>`:`<span class="${st[0].diff>0?'eu':st[0].diff<0?'us':''}" style="font-size:13px">${st[0].text}</span>`}<span style="font-size:10px;font-weight:500;opacity:.8">${live?"live":""}</span><span class="chev">${RC.open?"▲":"▼"}</span></span></div>`;
   if (RC.open){
     h+=`<div class="rc-body">`;
-    RC.m.forEach((m,mi)=>{
+    ACT().forEach((m,mi)=>{
       const r=st[mi].res[hole], sc=m.scores[hole]||[[null,null],[null,null]];
       const colour = st[mi].diff>0?"#1d4ed8":st[mi].diff<0?"#c62828":"var(--ink)";
-      h+=`<div class="mblk"><div class="mtitle"><span>Match ${mi+1} · Hole ${hole} · Par ${H.par} · SI ${H.si}${RC.net?" · net":""}</span><span class="mstatus" style="color:${colour}">${st[mi].text}</span></div>`;
+      h+=`<div class="mblk"><div class="mtitle"><span>${(RC.count||1)>1?`Match ${mi+1} · `:""}Hole ${hole} · Par ${H.par} · SI ${H.si}${RC.net?" · net":""}</span><span class="mstatus" style="color:${colour}">${st[mi].text}</span></div>`;
       [0,1].forEach(side=>{
         h+=`<div class="side"><div class="tag ${TEAM_CLS[side]}">${RC.teams[side].slice(0,3).toUpperCase()}</div>`;
         [0,1].forEach(p=>{
@@ -652,9 +653,10 @@ function renderRC(){
     h+=`<div class="rc-tools"><button data-act="setup">${RC.setup?"Close set-up":"Teams & handicaps"}</button><button data-act="copy">Copy results</button><button data-act="csv">Download CSV</button></div>`;
     if (RC.setup){
       h+=`<div class="setup"><div class="row" style="grid-template-columns:1fr 1fr"><input type="text" data-f="team" data-s="0" value="${RC.teams[0]}" aria-label="Team 1 name"><input type="text" data-f="team" data-s="1" value="${RC.teams[1]}" aria-label="Team 2 name"></div>
+        <div class="seg" style="margin:6px 0"><button data-act="count" data-c="1" aria-pressed="${(RC.count||1)===1}">1 match (2 v 2)</button><button data-act="count" data-c="2" aria-pressed="${RC.count===2}">2 matches</button></div>
         <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0"><input type="checkbox" data-f="net" ${RC.net?"checked":""}> Net scoring – strokes off the lowest handicap in each match</label>`;
-      RC.m.forEach((m,mi)=>{
-        h+=`<div style="font-weight:700;font-size:12.5px;margin-top:8px">Match ${mi+1}</div>`;
+      ACT().forEach((m,mi)=>{
+        if ((RC.count||1)>1) h+=`<div style="font-weight:700;font-size:12.5px;margin-top:8px">Match ${mi+1}</div>`;
         [0,1].forEach(side=>{
           h+=`<div class="lab ${TEAM_CLS[side]}">${RC.teams[side]} – name / handicap</div><div class="row">`;
           [0,1].forEach(p=>{ h+=`<input type="text" data-f="name" data-m="${mi}" data-s="${side}" data-p="${p}" value="${m.players[side][p]}"><input type="number" inputmode="numeric" data-f="hcp" data-m="${mi}" data-s="${side}" data-p="${p}" value="${m.hcp[side][p]}">`; });
@@ -669,15 +671,15 @@ function renderRC(){
 }
 
 function rcText(){
-  const st=RC.m.map(matchStatus), tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
-  let t=`Streamsong Black – Ryder Cup four-ball\n${RC.teams[0]} ${fmtPts(tot[0])} – ${fmtPts(tot[1])} ${RC.teams[1]}\n`;
-  RC.m.forEach((m,i)=>{ t+=`\nMatch ${i+1}: ${m.players[0].join(" & ")} v ${m.players[1].join(" & ")}\n${st[i].text}\n`;
+  const st=ACT().map(matchStatus), tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
+  let t=`Streamsong Black – best ball\n${RC.teams[0]} ${fmtPts(tot[0])} – ${fmtPts(tot[1])} ${RC.teams[1]}\n`;
+  ACT().forEach((m,i)=>{ t+=`\nMatch ${i+1}: ${m.players[0].join(" & ")} v ${m.players[1].join(" & ")}\n${st[i].text}\n`;
     let line=""; for(let n=1;n<=18;n++){ const r=st[i].res[n]; line+= !r||!r.done?"·":r.winner===0?RC.teams[0][0]:r.winner===1?RC.teams[1][0]:"½"; if(n===9) line+=" | "; } t+=line+"\n"; });
   return t;
 }
 function rcCSV(){
   const rows=[["Match","Hole","Par","SI",...[0,1].flatMap(s=>[0,1].map(p=>`${RC.teams[s]} P${p+1}`)),`${RC.teams[0]} best`,`${RC.teams[1]} best`,"Hole won by","Status"]];
-  RC.m.forEach((m,i)=>{ const st=matchStatus(m); for(let n=1;n<=18;n++){ const sc=m.scores[n]||[[null,null],[null,null]], r=st.res[n];
+  ACT().forEach((m,i)=>{ const st=matchStatus(m); for(let n=1;n<=18;n++){ const sc=m.scores[n]||[[null,null],[null,null]], r=st.res[n];
     rows.push([i+1,n,HOLES[n-1].par,HOLES[n-1].si,sc[0][0]??"",sc[0][1]??"",sc[1][0]??"",sc[1][1]??"", r&&r.best?r.best[0]??"":"", r&&r.best?r.best[1]??"":"", !r||!r.done?"":r.winner==null?"Halved":RC.teams[r.winner], n===18?st.text:""]); }
     rows.push([`Match ${i+1} players`, m.players[0].join(" & ")+` (hcp ${m.hcp[0].join("/")})`, "v", m.players[1].join(" & ")+` (hcp ${m.hcp[1].join("/")})`]); });
   return rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
@@ -689,6 +691,7 @@ document.getElementById("rc").addEventListener("click", e=>{
   const act=b.dataset.act, hole=state.hole+1;
   if (act==="toggle"){ RC.open=!RC.open; }
   else if (act==="setup"){ RC.setup=!RC.setup; }
+  else if (act==="count"){ RC.count=+b.dataset.c; }
   else if (act==="inc"||act==="dec"){
     const m=RC.m[+b.dataset.m], s=+b.dataset.s, p=+b.dataset.p;
     if (!m.scores[hole]) m.scores[hole]=[[null,null],[null,null]];
@@ -700,7 +703,7 @@ document.getElementById("rc").addEventListener("click", e=>{
   else if (act==="goto"){ go(+b.dataset.h-1); return; }
   else if (act==="copy"){ const t=rcText(); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Results copied – paste into WhatsApp")).catch(()=>{ window.prompt("Copy the results:", t); }); return; }
   else if (act==="csv"){ const blob=new Blob([rcCSV()],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`streamsong-rydercup-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast("CSV downloaded"); return; }
-  else if (act==="clearhole"){ RC.m.forEach(m=>delete m.scores[hole]); toast(`Hole ${hole} cleared`); }
+  else if (act==="clearhole"){ ACT().forEach(m=>delete m.scores[hole]); toast(`Hole ${hole} cleared`); }
   else if (act==="reset"){ if (b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Tap again to reset"; return; } RC.m.forEach(m=>m.scores={}); toast("All scores reset"); }
   saveRC(); renderRC();
 });
