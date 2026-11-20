@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamsong Black – 18-Hole Safe-Play Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0b1b2b;--ink:#132235;--muted:#5b6b7c;--safe:#1f9d5c;--safe-bg:#e8f6ee;--amber:#e3a33b;--amber-bg:#fdf3e1;--line:#e3e8ee;--bg:#f4f6f8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+  .wrap{max-width:480px;margin:0 auto;background:#fff;min-height:100vh}
+  header{background:var(--navy);color:#fff;padding:12px 16px 12px}
+  .kicker{font-size:11px;letter-spacing:.08em;font-weight:600;color:#9fe0bd;text-transform:uppercase}
+  .titlerow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2px}
+  h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:40px;line-height:1;margin:0}
+  .par{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:24px;font-weight:700;text-align:right;line-height:1}
+  .par small{display:block;font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:500;color:#9db0c3;margin-top:4px}
+  .nav{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:5}
+  .nav .arrow{flex:none;width:36px;height:36px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:18px;font-weight:700;color:var(--navy);cursor:pointer}
+  .holes{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;padding:2px}
+  .holes::-webkit-scrollbar{display:none}
+  .holes button{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font:600 13px Inter,Arial,sans-serif;color:var(--ink);cursor:pointer;position:relative}
+  .holes button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .holes button.traced::after{content:"";position:absolute;right:1px;top:1px;width:8px;height:8px;border-radius:50%;background:var(--safe);border:1.5px solid #fff}
+  .controls{padding:8px 12px 6px;border-bottom:1px solid var(--line)}
+  .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:4px 2px 5px}
+  .chips{display:flex;gap:4px;flex-wrap:wrap}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 8px;font:600 12px Inter,Arial,sans-serif;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:5px}
+  .chip .dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+  .chip span.y{font-weight:500;color:var(--muted)}
+  .chip[aria-pressed=true]{border-color:var(--navy);background:var(--navy);color:#fff}
+  .chip[aria-pressed=true] span.y{color:#b9c8d6}
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{flex:1;border:0;background:#fff;padding:7px 0;font:600 13px Inter,Arial,sans-serif;color:var(--ink);cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed=true]{background:var(--safe);color:#fff}
+  .mapcard{padding:10px 10px 2px;display:flex;justify-content:center}
+  .mapcard svg{display:block;max-width:100%;border-radius:10px}
+  .badge{display:block;text-align:center;font-size:11px;color:var(--muted);padding:2px 12px 0}
+  .badge b{color:var(--safe)}
+  .badge.schem b{color:#a8701a}
+  .legend{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--muted);padding:4px 12px 6px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-2px;margin-right:5px}
+  .plan{padding:2px 12px 4px}
+  .step{display:flex;gap:11px;border-left:4px solid var(--safe);background:var(--safe-bg);border-radius:6px;padding:9px 11px;margin:7px 0}
+  .num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--safe);color:#fff;font:700 13px Inter,Arial,sans-serif;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .step h3{margin:0 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#17784a}
+  .step p{margin:0;font-size:14px;line-height:1.36}
+  .yd{display:inline-block;margin-top:5px;font:600 12px Inter,Arial,sans-serif;background:#fff;border:1px solid #cfe9da;border-radius:6px;padding:3px 8px;color:#17784a}
+  .avoid{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:6px;padding:9px 11px;margin:7px 0 4px}
+  .avoid h3{margin:0 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a8701a}
+  .avoid p{margin:0;font-size:14px;line-height:1.36}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0}
+  th,td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  tr.sel td{background:#eef3f8;font-weight:600}
+  .section{padding:4px 12px 2px}
+  .aerial{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#eef3f8;border-radius:8px;padding:10px 12px;margin:8px 12px;text-decoration:none;color:var(--navy)}
+  .aerial b{font-size:13.5px}.aerial small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}.aerial .go{font-weight:700;font-size:20px}
+  footer{font-size:11px;color:var(--muted);padding:8px 14px 22px;line-height:1.45}
+  #print{display:none}
+  @media print{
+    @page{size:A4 portrait;margin:9mm}
+    body{background:#fff}
+    #screen{display:none}
+    #print{display:block}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .ppage{break-after:page;page-break-after:always}
+    .ppage:last-child{break-after:auto}
+    .ppage header{padding:10px 14px}
+    .ppage .sub{font-size:11.5px;color:var(--muted);padding:6px 2px 4px}
+    .cols{display:grid;grid-template-columns:46% minmax(0,1fr);gap:5mm;align-items:start}
+    .cols .mapcard{padding:0;justify-content:flex-start}
+    .step,.avoid{break-inside:avoid;margin:5px 0;padding:7px 9px}
+    .step p,.avoid p{font-size:12px}
+    table{font-size:10.5px} th,td{padding:4px 3px}
+    .section,.plan{padding-left:0;padding-right:0}
+    .pfoot{font-size:9.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  }
+</style>
+</head>
+<body>
+<div id="screen" class="wrap">
+  <header>
+    <div class="kicker">Team Europe / Streamsong Black</div>
+    <div class="titlerow">
+      <h1 id="h-title">HOLE 01</h1>
+      <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
+    </div>
+  </header>
+  <div class="nav">
+    <button class="arrow" data-step="-1" aria-label="Previous hole">‹</button>
+    <div class="holes" id="holes"></div>
+    <button class="arrow" data-step="1" aria-label="Next hole">›</button>
+  </div>
+  <div class="controls">
+    <div class="lbl">Tee</div>
+    <div class="chips" id="tees"></div>
+    <div class="lbl" style="margin-top:8px">Your typical drive (carry + roll)</div>
+    <div class="seg" id="drives"></div>
+  </div>
+  <div class="mapcard" id="mapwrap"></div>
+  <div class="badge" id="badge"></div>
+  <div class="legend"><span><i style="background:var(--safe)"></i>Recommended target</span><span><i style="background:var(--amber)"></i>Give this space</span></div>
+  <div class="plan" id="plan"></div>
+  <div class="section"><div class="lbl">Plan by tee (drive <span id="drv-lbl"></span> yd)</div><table id="tbl"></table></div>
+  <a class="aerial" id="aerial" href="#" target="_blank" rel="noopener">
+    <div><b>Open the real aerial</b><small>allgolfholes.com – hole shape and distance overlay</small></div><div class="go">›</div>
+  </a>
+  <footer>
+    Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial. Plans assume a 16–18 handicap with a comfortable 2nd-shot limit of 190 yd. Today's flags, wind and caddie advice take priority.
+  </footer>
+</div>
+<div id="print"></div>
+
+<script>
+const K = 2.54; // px per yard
+const AERIAL = n => `https://www.allgolfholes.com/courses/florida/streamsong-resort-black-course/${n}${n%10===1&&n!==11?'st':n%10===2&&n!==12?'nd':n%10===3&&n!==13?'rd':'th'}-hole`;
+const TEE_COLOURS = { Green:"#2e8b57", Black:"#111", Silver:"#c0c7cf", Gold:"#d4a72c" };
+const DRIVES = [190, 210, 230, 250];
+const MAX_SECOND = 190, LAYUP_TARGET = 100;
+
+// ---------------- Course data ----------------
+// Generated holes: path = [[yards from green, lateral yards (+ = right)]...], fw = [[from,to,width,lat]], bunkers = [d,lat,w,h,label,side],
+// areas = {t:type, d1,d2, l1,l2, label}; aim = lateral yards for tee/layup/green targets.
+const HOLES = [
+{ n:1, par:5, si:12, tees:{Green:573,Black:508,Silver:466,Gold:420}, traced:true,
+  steps:{tee:"Centre-right fairway, staying left of the long waste area. Do not chase the bunkers on the left.",
+         next:"Lay up in the playable left-centre area, past the left bunkers and away from the sand short-right of the green. Leave a comfortable wedge from about 100 yards.",
+         green:"Aim at the middle of the green; slightly short is kinder than too long."},
+  avoid:"The two big bunkers on the left (about 200–270 yd out), the long waste area all down the right, the sand short-right of the green and the bunkers left of and behind it.",
+  aim:{tee:5.5, layup:-8, green:0},
+  view:[180,850,770,1530],
+  centre:[[805,975],[737,1220],[722,1347],[693,1470],[600,1680],[490,1880],[405,2000],[366,2150],[352,2330],[348,2400]],
+  shapes:{
+    native:"M690,860 C760,830 880,850 920,900 C960,960 930,1120 900,1200 C870,1330 840,1480 800,1600 C760,1720 680,1860 600,1980 C540,2080 480,2180 470,2280 C460,2380 420,2440 360,2440 C300,2440 250,2380 240,2280 C230,2180 290,2030 330,1940 C390,1800 440,1650 480,1520 C520,1380 560,1200 600,1080 C630,990 640,890 690,860 Z",
+    rough:"M720,880 C790,860 880,890 895,960 C910,1050 880,1150 860,1230 C830,1360 800,1480 770,1580 C730,1700 660,1830 590,1940 C540,2010 470,2080 420,2140 L400,2380 C380,2420 330,2420 315,2380 C300,2300 310,2150 340,2050 C380,1930 440,1800 490,1680 C530,1580 560,1440 590,1300 C610,1180 640,1050 670,960 C685,915 700,890 720,880 Z",
+    fairway:"M770,960 C800,960 820,1000 822,1060 C826,1140 820,1220 800,1320 C785,1400 760,1490 742,1562 C720,1640 690,1700 672,1700 C640,1770 590,1850 540,1920 C510,1960 470,1980 448,1968 C430,1950 440,1900 470,1840 C510,1760 545,1690 566,1636 C590,1580 610,1530 620,1490 C640,1420 650,1340 660,1260 C670,1180 690,1100 720,1040 C735,1000 750,965 770,960 Z",
+    green:"M790,905 C825,900 850,930 852,975 C855,1025 838,1065 805,1068 C775,1070 760,1035 758,990 C756,945 765,910 790,905 Z",
+    teestrip:"M340,1990 C358,1985 372,2000 374,2040 L380,2240 C382,2275 372,2300 356,2300 C340,2300 334,2280 333,2250 L330,2030 C330,2005 333,1992 340,1990 Z"
+  },
+  areasPx:[{t:"waste", d:"M850,1185 C878,1195 872,1250 858,1300 C835,1400 810,1490 780,1580 C745,1680 690,1790 620,1900 C560,1990 490,2080 440,2160 C415,2205 395,2250 380,2262 C360,2270 352,2245 360,2210 C372,2150 400,2090 445,2030 C490,1975 530,1940 548,1918 C600,1850 650,1770 678,1705 C700,1660 730,1600 748,1550 C770,1480 790,1400 805,1330 C820,1265 830,1210 850,1185 Z", label:"Waste area – keep left", lx:610, ly:1960, rot:-58}],
+  bunkersPx:[
+    {d:"M500,1460 C530,1440 575,1450 585,1490 C595,1530 575,1560 560,1580 C548,1600 555,1625 540,1640 C515,1660 490,1630 492,1590 C494,1555 470,1500 500,1460 Z", label:"Fairway bunkers", lx:540, ly:1425, anchor:"middle"},
+    {d:"M585,1240 C605,1225 628,1240 630,1275 C632,1305 615,1320 608,1345 C600,1370 575,1365 570,1335 C565,1300 568,1255 585,1240 Z"},
+    {d:"M770,1120 C790,1095 820,1105 830,1125 C845,1100 870,1100 885,1125 C898,1150 880,1175 860,1170 C845,1168 835,1160 825,1165 C805,1175 775,1160 770,1140 Z", label:"Sand short-right", lx:905, ly:1205, anchor:"end"},
+    {d:"M735,900 C748,885 762,895 760,920 C758,945 748,960 738,955 C728,950 726,915 735,900 Z", label:"Behind / left", lx:722, ly:885, anchor:"end"},
+    {d:"M725,995 C740,985 762,990 762,1003 C762,1015 740,1018 728,1012 C720,1008 718,1000 725,995 Z"},
+    {d:"M778,905 C790,898 812,898 815,906 C815,914 795,916 782,913 C774,911 773,908 778,905 Z"},
+    {d:"M836,932 C844,926 856,928 856,936 C856,944 846,946 838,943 C832,940 832,935 836,932 Z"}],
+  markers:[{d:100,x:737,y:1220},{d:150,x:722,y:1347},{d:200,x:693,y:1470}]
+},
+{ n:2, par:4, si:16, tees:{Green:361,Black:326,Silver:309,Gold:276},
+  steps:{tee:"Aim left-centre off the tee, away from the bunkers on the right.", next:"Take enough club to carry the bunker in front of the elevated green.", green:"If the flag is right, aim middle-left; if the flag is left, aim middle-right."},
+  avoid:"A miss short-right, or on the same side as an edge flag, leaves little room.",
+  path:[[0,4],[120,0],[380,-6]], fw:[[38,250,42,0]], green:[17,19],
+  bunkers:[[135,22,14,30,"Fairway bunkers","R"],[178,17,10,16],[24,0,30,9,"Front bunker","L"],[10,24,10,14]],
+  areas:[], aim:{tee:-9,green:0}
+},
+{ n:3, par:4, si:4, tees:{Green:480,Black:423,Silver:394,Gold:306}, layupOver:170, layupTo:95,
+  steps:{tee:"Aim middle-left on the fairway; give yourself a clear next shot.", next:"A cross-hazard / waste area sits roughly 60–75 yards short of the green. Cross it only with a comfortable carry.", green:"If the approach is too long, stop before the crossing, then pitch safely into the middle."},
+  avoid:"Right-side fairway sand and the cross-hazard. Do not assume it is water.",
+  path:[[0,0],[200,0],[495,8]], fw:[[85,340,42,0],[0,54,34,0]], green:[17,20],
+  bunkers:[[225,21,12,44,"Right fairway sand","R"],[12,-20,9,14]],
+  areas:[{t:"waste",d1:56,d2:80,l1:-40,l2:40,label:"Cross-hazard (sand)"}], aim:{tee:-8,layup:-4,green:0}
+},
+{ n:4, par:5, si:2, tees:{Green:601,Black:581,Silver:550,Gold:450}, layupTo:110, noLand:[[200,268]],
+  steps:{tee:"Choose the more generous lower RIGHT fairway from the tee.", next:"Plan when to move LEFT across the creek / hazard to the higher fairway, only with a safe carry.", green:"Treat this as a three- or four-shot hole: get on the upper ground, then target the centre of the green."},
+  avoid:"Running too far down the lower-right strip makes the crossing tougher.",
+  path:[[0,-18],[150,-20],[250,0],[420,16],[615,10]], fw:[[265,470,48,4],[18,200,38,0]], green:[18,20],
+  bunkers:[[30,16,10,18],[8,-20,9,12]],
+  areas:[{t:"waste",d1:205,d2:262,l1:-45,l2:30,label:"Creek / sandy hazard"},{t:"waste",d1:262,d2:440,l1:-48,l2:-22,label:""}], aim:{tee:8,layup:-4,green:0}
+},
+{ n:5, par:3, si:6, tees:{Green:211,Black:177,Silver:158,Gold:135},
+  steps:{tee:"Aim for the MIDDLE of this uphill par 3; club up for the rise.", next:"If the flag is to the right, favour the centre, not the right edge.", green:"Make the first putt about distance, not holing a miracle putt."},
+  avoid:"The huge RIGHT bunker; there is also trouble left of the green.",
+  path:[[0,0],[225,0]], fw:[], green:[18,19],
+  bunkers:[[4,26,16,36,"Huge right bunker","R"]],
+  areas:[{t:"scrub",d1:-15,d2:28,l1:-46,l2:-22,label:"Trouble left"}], aim:{green:-2}
+},
+{ n:6, par:4, si:18, tees:{Green:342,Black:321,Silver:299,Gold:252}, layBack:140,
+  steps:{tee:"Take a club you can place in the open part of the fairway, rather than maximum distance.", next:"Avoid the central fairway bunkers and leave a simple short-iron shot.", green:"Middle of the green is the target regardless of a tight edge flag."},
+  avoid:"Sand near the green and an awkward angle after a risky tee shot.",
+  path:[[0,0],[355,0]], fw:[[25,240,44,0]], green:[18,19],
+  bunkers:[[100,4,13,15,"Central bunkers","R"],[122,-9,9,10],[8,24,13,15,"Greenside pit","R"]],
+  areas:[], aim:{tee:-7,green:-2}
+},
+{ n:7, par:3, si:14, tees:{Green:178,Black:158,Silver:135,Gold:103},
+  steps:{tee:"Par 3: use the middle of the green as your target.", next:"Choose the club to reach the wider middle of the green, not just the front fringe.", green:"Aim for a comfortable two-putt if the first putt is long."},
+  avoid:"The bunkers across the front and on both sides; avoid a shot that comes up short.",
+  path:[[0,0],[192,0]], fw:[], green:[17,16],
+  bunkers:[[22,0,34,8,"Front bunkers","R"],[2,-23,8,20],[2,23,8,20,"Side bunkers","R"]],
+  areas:[], aim:{green:0}
+},
+{ n:8, par:4, si:8, tees:{Green:427,Black:408,Silver:377,Gold:357},
+  steps:{tee:"Aim left-centre off the tee and allow room for the fairway to bend right.", next:"Play into the central, broad part of the large green.", green:"Check how deep the flag actually is; a centre-green putt is a good result."},
+  avoid:"Cutting the right corner over sand, and missing the green on the left.",
+  path:[[0,32],[110,30],[235,6],[440,0]], fw:[[25,300,44,0]], green:[22,24],
+  bunkers:[[215,26,15,44,"Corner sand – don't cut","R"]],
+  areas:[{t:"scrub",d1:-12,d2:30,l1:-46,l2:-24,label:"Miss-left trouble"}], aim:{tee:-8,green:0}
+},
+{ n:9, par:4, si:10, tees:{Green:450,Black:408,Silver:360,Gold:317},
+  steps:{tee:"Find the broad middle of the fairway, ideally from a level lie. The windmill is the aiming line.", next:"Check the tee-side flag-location sign, then carry the rise to the hidden punchbowl green.", green:"Let the contours work, and use distance control on the enormous putting surface."},
+  avoid:"Leaving the shot short of the rise, or forcing an edge flag.",
+  path:[[0,0],[465,0]], fw:[[62,320,56,0]], green:[25,25],
+  bunkers:[[160,-30,9,14],[230,30,9,16]],
+  areas:[{t:"rise",d1:30,d2:58,l1:-34,l2:34,label:"Blind rise – carry it"}], aim:{tee:0,green:0}
+},
+{ n:10, par:5, si:11, tees:{Green:548,Black:524,Silver:502,Gold:434}, layupTo:115,
+  steps:{tee:"Aim centre-left down the generous section of fairway.", next:"Lay up in the fairway, short of the large sand complex where the hole narrows near the green.", green:"For the final approach aim at the middle of the green, not the back edge."},
+  avoid:"Sand across the approach and scrub on the right.",
+  path:[[0,0],[560,-4]], fw:[[105,420,54,-2],[0,40,28,0]], green:[18,20],
+  bunkers:[],
+  areas:[{t:"waste",d1:42,d2:100,l1:-38,l2:38,label:"Large sand complex"},{t:"scrub",d1:110,d2:390,l1:32,l2:56,label:"Scrub"}], aim:{tee:-8,layup:-5,green:0}
+},
+{ n:11, par:4, si:3, tees:{Green:463,Black:395,Silver:378,Gold:320}, layupOver:175, layupTo:90,
+  steps:{tee:"Favour the middle-left of the fairway for a cleaner second shot.", next:"If the long approach is uncomfortable, pitch to a clear short-grass position.", green:"Aim at the middle of the green and prepare for a long first putt."},
+  avoid:"The long sandy / waste area and rough to the RIGHT.",
+  path:[[0,0],[478,-4]], fw:[[0,320,42,0]], green:[19,24],
+  bunkers:[[14,-20,9,13]],
+  areas:[{t:"waste",d1:-10,d2:330,l1:26,l2:56,label:"Long waste area"}], aim:{tee:-8,layup:-6,green:-2}
+},
+{ n:12, par:5, si:7, tees:{Green:571,Black:531,Silver:510,Gold:404},
+  steps:{tee:"Aim at the middle of the fairway and keep the ball in play.", next:"On the second, leave a full comfortable wedge rather than forcing the green.", green:"Approach the middle of the green; check the depth."},
+  avoid:"The lake off the left-hand side, and sand on the right of the final approach.",
+  path:[[0,0],[585,0]], fw:[[0,440,46,0]], green:[18,20],
+  bunkers:[[42,21,11,44,"Sand right","R"]],
+  areas:[{t:"water",d1:120,d2:420,l1:-85,l2:-32,label:"Lake"}], aim:{tee:2,layup:2,green:0}
+},
+{ n:13, par:4, si:9, tees:{Green:430,Black:409,Silver:368,Gold:308},
+  steps:{tee:"Aim centre-right off the tee; give the sand on the left a wide berth.", next:"Check which of the double-green flag locations is in play TODAY.", green:"Aim at the middle of that assigned green and avoid going through the back."},
+  avoid:"The left-side bunkers and the trees / scrub beyond the green.",
+  path:[[0,0],[445,0]], fw:[[25,320,44,0]], green:[30,18],
+  bunkers:[[215,-22,12,42,"Left bunkers","L"],[150,-20,10,24]],
+  areas:[{t:"scrub",d1:-50,d2:-20,l1:-45,l2:45,label:"Trees / scrub long"}], aim:{tee:8,green:0}, doubleGreen:true
+},
+{ n:14, par:4, si:15, tees:{Green:298,Black:286,Silver:261,Gold:242}, layBack:80,
+  steps:{tee:"Use the RIGHT half of the fairway to stay away from the long left bunker.", next:"Unless a short carry is easy, lay up to a comfortable pitch instead of trying to drive the green.", green:"Play to the centre of the raised green."},
+  avoid:"The long bunker running up the LEFT side; it continues toward the green.",
+  path:[[0,0],[312,0]], fw:[[28,230,40,0]], green:[17,18],
+  bunkers:[],
+  areas:[{t:"waste",d1:8,d2:210,l1:-28,l2:-15,label:"Long left bunker"}], aim:{tee:8,green:2}
+},
+{ n:15, par:3, si:17, tees:{Green:133,Black:131,Silver:110,Gold:78},
+  steps:{tee:"Par 3: aim for the middle of the green, not an edge flag.", next:"Pick a club for the actual flag distance and wind; do not force the ball.", green:"If you miss, take the simple route back to the green."},
+  avoid:"Bunkers close to the FRONT and SIDES of the green.",
+  path:[[0,0],[147,0]], fw:[], green:[15,15],
+  bunkers:[[20,-6,22,8,"Front bunkers","R"],[2,-20,8,16],[2,20,8,16,"Side bunkers","R"]],
+  areas:[], aim:{green:0}
+},
+{ n:16, par:4, si:1, tees:{Green:463,Black:442,Silver:400,Gold:323}, layupOver:170, layupTo:90,
+  steps:{tee:"This is the hardest hole: choose a reliable tee shot into the visible fairway corridor.", next:"If reaching the green needs a perfect long iron, play safely short for a pitch.", green:"Aim for the middle of the green; bogey is acceptable here."},
+  avoid:"Sand and awkward ground around the narrow landing and approach areas.",
+  path:[[0,0],[478,0]], fw:[[0,330,32,0]], green:[17,19],
+  bunkers:[[235,-20,10,26],[255,19,10,30,"Sand at landing","R"],[70,-17,9,16],[42,18,10,18,"Approach sand","R"]],
+  areas:[], aim:{tee:0,layup:0,green:0}
+},
+{ n:17, par:3, si:13, tees:{Green:205,Black:189,Silver:154,Gold:124},
+  steps:{tee:"Par 3: aim at the LEFT-CENTRE, or the gentle left slope that can feed toward the green.", next:"Do not add a club just because the view is intimidating; it plays downhill.", green:"Prefer short / left recovery ground to a long miss."},
+  avoid:"Over the BACK is tough; water and trouble lie beyond and right of the green.",
+  path:[[0,0],[220,0]], fw:[], green:[20,18],
+  bunkers:[[8,22,9,16]],
+  areas:[{t:"water",d1:-55,d2:-20,l1:-10,l2:60,label:"Water long"},{t:"water",d1:-20,d2:30,l1:26,l2:60,label:""},{t:"native",d1:32,d2:150,l1:-36,l2:36,label:"Native carry (downhill)"},{t:"slope",d1:-5,d2:30,l1:-34,l2:-20,label:"Feed slope"}], aim:{green:-6}
+},
+{ n:18, par:5, si:5, tees:{Green:586,Black:530,Silver:495,Gold:431},
+  steps:{tee:"Keep your tee shot in the broad LEFT fairway, away from the lake on the right.", next:"Play a safe second shot up the LEFT route, leaving a wedge into the green.", green:"Aim middle-left of the green and let the ground help."},
+  avoid:"The RIGHT-side water and the bunkers guarding the lake-side approach.",
+  path:[[0,6],[200,0],[600,-6]], fw:[[0,470,52,-4]], green:[19,20],
+  bunkers:[[18,22,10,18],[62,21,10,22,"Lake-side bunkers","R"]],
+  areas:[{t:"water",d1:-10,d2:370,l1:30,l2:85,label:"Lake"}], aim:{tee:-12,layup:-10,green:-6}
+}];
+
+// ---------------- Geometry helpers ----------------
+function pointAtPx(c, d, off=0){
+  let acc=0;
+  for (let i=1;i<c.length;i++){
+    const [x0,y0]=c[i-1],[x1,y1]=c[i];
+    const seg=Math.hypot(x1-x0,y1-y0)/K;
+    if (acc+seg>=d || i===c.length-1){
+      const f=(d-acc)/seg, x=x0+(x1-x0)*f, y=y0+(y1-y0)*f;
+      const tx=(x0-x1)/(seg*K), ty=(y0-y1)/(seg*K);
+      return {x:x+(-ty)*off, y:y+tx*off, ang:Math.atan2(-tx, ty)*180/Math.PI};
+    }
+    acc+=seg;
+  }
+}
+function smoothLine(pts){
+  if (pts.length<3) return "M"+pts.map(p=>p.x.toFixed(1)+","+p.y.toFixed(1)).join(" L");
+  let d=`M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i=1;i<pts.length-1;i++){
+    const mx=(pts[i].x+pts[i+1].x)/2, my=(pts[i].y+pts[i+1].y)/2;
+    d+=` Q${pts[i].x.toFixed(1)},${pts[i].y.toFixed(1)} ${mx.toFixed(1)},${my.toFixed(1)}`;
+  }
+  const l=pts[pts.length-1]; return d+` L${l.x.toFixed(1)},${l.y.toFixed(1)}`;
+}
+function band(c, d1, d2, l1, l2){ // polygon between lateral l1..l2 (yards), from d1 to d2
+  const n=Math.max(4, Math.round(Math.abs(d2-d1)/12)), L=[], R=[];
+  for (let i=0;i<=n;i++){ const d=d1+(d2-d1)*i/n; L.push(pointAtPx(c,d,l1*K)); R.push(pointAtPx(c,d,l2*K)); }
+  return closedPath(chaikin([...L, ...R.reverse()], 3));
+}
+function chaikin(pts, it){
+  for (let k=0;k<it;k++){
+    const out=[];
+    for (let i=0;i<pts.length;i++){
+      const a=pts[i], b=pts[(i+1)%pts.length];
+      out.push({x:.75*a.x+.25*b.x, y:.75*a.y+.25*b.y},{x:.25*a.x+.75*b.x, y:.25*a.y+.75*b.y});
+    }
+    pts=out;
+  }
+  return pts;
+}
+function closedPath(pts){ return "M"+pts.map(p=>p.x.toFixed(1)+","+p.y.toFixed(1)).join(" L")+" Z"; }
+function blob(cx, cy, rx, ry, ang, seed){
+  const pts=[], n=10;
+  for (let i=0;i<n;i++){
+    const a=i/n*Math.PI*2, j=1+0.13*Math.sin(seed*7.1+i*2.3);
+    const x=Math.cos(a)*rx*j, y=Math.sin(a)*ry*j, r=ang*Math.PI/180;
+    pts.push({x:cx+x*Math.cos(r)-y*Math.sin(r), y:cy+x*Math.sin(r)+y*Math.cos(r)});
+  }
+  return closedPath(chaikin(pts, 2));
+}
+
+// Build drawable geometry for generated holes
+function build(h){
+  if (h.traced){ h.geo = {view:h.view, centre:h.centre}; return; }
+  const maxT = Math.max(...Object.values(h.tees));
+  // sample path in yards → px, green at (0,0)
+  const P=h.path, samples=[];
+  for (let d=0; d<=P[P.length-1][0]; d+=8){
+    let j=1; while (j<P.length-1 && P[j][0]<d) j++;
+    const [d0,l0]=P[j-1],[d1,l1]=P[j], f=Math.min(1,(d-d0)/(d1-d0));
+    samples.push([l0+(l1-l0)*f, d]);
+  }
+  for (let pass=0; pass<3; pass++) for (let i=1;i<samples.length-1;i++) samples[i][0]=(samples[i-1][0]+samples[i][0]+samples[i+1][0])/3;
+  const c = samples.map(([l,d])=>[l*K, d*K]);
+  const g = {centre:c, fw:[], bunkers:[], areas:[]};
+  const fwMax = Math.max(18, ...h.fw.map(f=>f[2]/2+Math.abs(f[3]||0)));
+  const env = (h.par===3) ? 40 : fwMax+30;
+  g.native = band(c, -38, maxT+16, -(env+28), env+28);
+  if (h.par===3){
+    g.rough = band(c, -24, 34, -36, 36);
+  } else {
+    g.rough = band(c, -24, Math.max(...h.fw.map(f=>f[1]))+12, -(fwMax+16), fwMax+16);
+  }
+  h.fw.forEach(([a,b,w,lat])=>g.fw.push(band(c, a, b, (lat||0)-w/2, (lat||0)+w/2)));
+  const gp = pointAtPx(c,0,0);
+  g.green = blob(gp.x, gp.y, h.green[0]*K, h.green[1]*K, gp.ang, h.n);
+  const teeMin = Math.min(...Object.values(h.tees)), tA=pointAtPx(c,teeMin-6,0);
+  g.tee = band(c, teeMin-8, maxT+8, -6, 6);
+  h.bunkers.forEach(([d,lat,w,hh,label,side],i)=>{
+    const p=pointAtPx(c,d,lat*K);
+    g.bunkers.push({d:blob(p.x,p.y,w/2*K,hh/2*K,p.ang,h.n*3+i), label, side, x:p.x, y:p.y, w:w*K});
+  });
+  h.areas.forEach(a=>{
+    const mid=pointAtPx(c,(a.d1+a.d2)/2,(a.l1+a.l2)/2*K);
+    g.areas.push({t:a.t, d:band(c,a.d1,a.d2,a.l1,a.l2), label:a.label, x:mid.x, y:mid.y, long:(a.d2-a.d1)>(a.l2-a.l1)*1.6, ang:mid.ang});
+  });
+  // view bounds
+  const xs=[], ys=[];
+  const vm = env+28+(h.par===3?30:42);
+  for (let d=-38; d<=maxT+16; d+=20){ [-vm,vm].forEach(l=>{const p=pointAtPx(c,d,l*K); xs.push(p.x); ys.push(p.y);}); }
+  { const p=pointAtPx(c,maxT+16,0); ys.push(p.y); }
+  h.areas.forEach(a=>[a.l1,a.l2].forEach(l=>[a.d1,a.d2].forEach(d=>{const p=pointAtPx(c,d,l*K); xs.push(p.x); ys.push(p.y);})));
+  const pad=14, minX=Math.min(...xs)-pad, maxX=Math.max(...xs)+pad, minY=Math.min(...ys)-pad, maxY=Math.max(...ys)+pad;
+  g.view=[minX, minY, Math.max(maxX-minX, 300), maxY-minY];
+  h.geo = g;
+}
+HOLES.forEach(build);
+
+// ---------------- Shot plan ----------------
+function plan(h, tee, drive){
+  const L=h.tees[tee], shots=[];
+  if (h.par===3) return [{kind:"approach", carry:L, left:0}];
+  let first = drive;
+  if (h.layBack) first = Math.min(drive, Math.max(L-h.layBack, 150));
+  if (first >= L-20) first = L-40;
+  let left = L-first; shots.push({kind:"tee", carry:first, left});
+  const target = h.layupTo || LAYUP_TARGET;
+  if (h.par===5){
+    let guard=0;
+    while (left-target>=40 && guard++<4){
+      let shot=Math.min(MAX_SECOND, left-target), land=left-shot;
+      (h.noLand||[]).forEach(([d1,d2])=>{ if (land>d1-10 && land<d2+10){ const alt=left-(d2+10); if (alt>=40) { shot=alt; land=left-shot; } } });
+      left=land; shots.push({kind:"layup", carry:shot, left});
+      if (left<=160) break;
+    }
+    shots.forEach((x,i)=>{ if (x.kind==="layup" && shots[i+1] && shots[i+1].kind==="layup") x.kind="layup2"; });
+  } else if (h.layupOver && left>h.layupOver){
+    const s=left-target; left-=s; shots.push({kind:"layup", carry:s, left});
+  }
+  shots.push({kind:"approach", carry:left, left:0});
+  return shots;
+}
+
+// ---------------- SVG ----------------
+function svgFor(h, tee, drive, pxW, pxH){
+  const g=h.geo, [vx,vy,vw,vh]=g.view;
+  const scale=Math.min(pxW/vw, pxH/vh), U=1/scale;   // U = view units per screen px
+  const W=vw*scale, H=vh*scale;
+  const L=h.tees[tee], shots=plan(h,tee,drive), c=g.centre;
+  const F='font-family="Inter,Arial"';
+  const s=[];
+  const id="h"+h.n+Math.round(pxW);
+  s.push(`<svg width="${W.toFixed(0)}" height="${H.toFixed(0)}" viewBox="${vx} ${vy} ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hole ${h.n} map with safe targets">`);
+  s.push(`<defs>
+    <pattern id="mow${id}" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(25)"><rect width="28" height="28" fill="#6fa64a"/><rect width="14" height="14" fill="#77ad52"/><rect x="14" y="14" width="14" height="14" fill="#77ad52"/></pattern>
+    <pattern id="sand${id}" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#efe6cf"/><circle cx="3" cy="3" r="1" fill="#e2d6b6"/></pattern>
+    <pattern id="scrub${id}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#7d8a52"/><circle cx="4" cy="4" r="2.4" fill="#5d6b38"/><circle cx="11" cy="10" r="2" fill="#5d6b38"/></pattern>
+    <pattern id="rise${id}" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#7fb35c"/><rect width="5" height="16" fill="#5f9440"/></pattern>
+    <pattern id="native${id}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#c9b98a"/><path d="M3,10 l1,-5 M8,11 l1,-6" stroke="#9c8c5c" stroke-width="1.4"/></pattern>
+    <marker id="arr${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b1b2b"/></marker>
+  </defs>`);
+  s.push(`<rect x="${vx}" y="${vy}" width="${vw}" height="${vh}" fill="#f3f1ea"/>`);
+  const label=(x,y,t,anchor="middle",col="#8a5a10",rot=0)=>{
+    if (!rot){
+      const w=t.length*6.6*U, m=4*U;
+      if (anchor==="start" && x+w>vx+vw-m){ anchor="end"; x=vx+vw-m; y+=15*U; }
+      else if (anchor==="end" && x-w<vx+m){ anchor="start"; x=vx+m; y+=15*U; }
+      else if (anchor==="middle"){ x=Math.min(Math.max(x, vx+w/2+m), vx+vw-w/2-m); }
+    }
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" ${F} font-size="${11*U}" font-weight="700" fill="${col}" paint-order="stroke" stroke="#f6f3ea" stroke-width="${3*U}" ${rot?`transform="rotate(${rot} ${x} ${y})"`:''}>${t}</text>`; };
+  const labels=[];
+
+  if (h.traced){
+    s.push(`<path d="${h.shapes.native}" fill="#b49a6a" opacity=".55"/><path d="${h.shapes.rough}" fill="#8db36a"/>`);
+    h.areasPx.forEach(a=>{ s.push(`<path d="${a.d}" fill="url(#sand${id})" stroke="#d9c99f" stroke-width="2"/>`); labels.push(label(a.lx,a.ly,a.label,"middle","#8a5a10",a.rot)); });
+    s.push(`<path d="${h.shapes.teestrip}" fill="#86c062" stroke="#6aa64a" stroke-width="2"/>`);
+    s.push(`<path d="${h.shapes.fairway}" fill="url(#mow${id})" stroke="#5e963c" stroke-width="2"/>`);
+    s.push(`<path d="${h.shapes.green}" fill="#a6db7c" stroke="#7fbf55" stroke-width="3"/>`);
+    h.bunkersPx.forEach(b=>{
+      s.push(`<path d="${b.d}" fill="none" stroke="#e3a33b" stroke-width="${5*U}" stroke-opacity=".6" stroke-linejoin="round"/><path d="${b.d}" fill="#f4ecd6" stroke="#d6c393" stroke-width="2"/>`);
+      if (b.label) labels.push(label(b.lx,b.ly,b.label,b.anchor));
+    });
+  } else {
+    s.push(`<path d="${g.native}" fill="#b49a6a" opacity=".5"/><path d="${g.rough}" fill="#8db36a"/>`);
+    g.areas.forEach(a=>{
+      const fill = a.t==="water" ? "#7fb6d9" : a.t==="scrub" ? `url(#scrub${id})` : a.t==="rise" ? `url(#rise${id})` : a.t==="native" ? `url(#native${id})` : a.t==="slope" ? "rgba(31,157,92,.25)" : `url(#sand${id})`;
+      const stroke = a.t==="water" ? "#5d97bd" : a.t==="slope" ? "#1f9d5c" : "#cbb98a";
+      if (a.t!=="native" && a.t!=="slope") s.push(`<path d="${a.d}" fill="none" stroke="#e3a33b" stroke-width="${5*U}" stroke-opacity=".55" stroke-linejoin="round"/>`);
+      s.push(`<path d="${a.d}" fill="${fill}" stroke="${stroke}" stroke-width="2" ${a.t==="slope"?'stroke-dasharray="6 5"':''}/>`);
+      if (a.label){
+        const col = a.t==="water" ? "#1e5a85" : a.t==="slope" ? "#17784a" : a.t==="native" ? "#5a4a1a" : "#8a5a10";
+        let rot = a.long ? (a.ang>0 ? a.ang-90 : a.ang+90) : 0; if (a.long && Math.abs(rot)<20) rot = -90;
+        labels.push(label(a.x, a.y+4*U, a.label, "middle", col, a.long?rot:0));
+      }
+    });
+    s.push(`<path d="${g.tee}" fill="#86c062" stroke="#6aa64a" stroke-width="2"/>`);
+    g.fw.forEach(f=>s.push(`<path d="${f}" fill="url(#mow${id})" stroke="#5e963c" stroke-width="2"/>`));
+    s.push(`<path d="${g.green}" fill="#a6db7c" stroke="#7fbf55" stroke-width="3"/>`);
+    if (h.doubleGreen) labels.push(label(pointAtPx(c,0,0).x, pointAtPx(c,0,0).y-(h.green[1]*K+8*U), "Double green – check today's flag", "middle", "#17784a"));
+    g.bunkers.forEach(b=>{
+      s.push(`<path d="${b.d}" fill="none" stroke="#e3a33b" stroke-width="${5*U}" stroke-opacity=".6" stroke-linejoin="round"/><path d="${b.d}" fill="#f4ecd6" stroke="#d6c393" stroke-width="2"/>`);
+      if (b.label){
+        const right = b.side!=="L";
+        labels.push(label(b.x + (right? b.w/2+6*U : -(b.w/2+6*U)), b.y+4*U, b.label, right?"start":"end"));
+      }
+    });
+  }
+  // flag
+  const gp = h.traced ? {x:812,y:990} : pointAtPx(c,0,0);
+  s.push(`<line x1="${gp.x+4*U}" y1="${gp.y}" x2="${gp.x+4*U}" y2="${gp.y-16*U}" stroke="#333" stroke-width="${1.2*U}"/><path d="M${gp.x+4*U},${gp.y-16*U} l${8*U},${3*U} l${-8*U},${3*U}z" fill="#d33"/>`);
+
+  // distance markers
+  const mcol={100:"#e53935",150:"#fff",200:"#1e40ff"};
+  [100,150,200,250,300].filter(d=>d<L-30).forEach(d=>{
+    const m = h.markers && h.markers.find(mm=>mm.d===d);
+    const p = m ? m : pointAtPx(c,d,0);
+    const col = mcol[d] || "#fff";
+    s.push(`<circle cx="${p.x}" cy="${p.y}" r="${(mcol[d]?4.2:3.2)*U}" fill="${col}" fill-opacity="${mcol[d]?1:.75}" stroke="#111" stroke-width="${1.4*U}"/>`);
+    labels.push(`<text x="${p.x+8*U}" y="${p.y+3.6*U}" ${F} font-size="${10*U}" font-weight="700" fill="#fff" paint-order="stroke" stroke="#2d4a22" stroke-width="${2.4*U}">${d}</text>`);
+  });
+
+  // tees
+  const teeP = t => h.traced ? pointAtPx(c,h.tees[t],0) : pointAtPx(c,h.tees[t],0);
+  Object.keys(h.tees).forEach(t=>{
+    const p=teeP(t), sel=t===tee, w=(sel?20:11)*U, hh=(sel?9:5)*U;
+    s.push(`<rect x="${p.x-w/2}" y="${p.y-hh/2}" width="${w}" height="${hh}" rx="${2*U}" fill="${TEE_COLOURS[t]}" stroke="${sel?'#fff':'rgba(0,0,0,.35)'}" stroke-width="${(sel?1.5:.8)*U}" opacity="${sel?1:.75}"/>`);
+    if (sel) labels.push(label(p.x-14*U, p.y+4*U, `${t} ${h.tees[t]}`, "end", "#0b1b2b"));
+  });
+
+  // shots
+  const pts=[teeP(tee)]; let dist=L;
+  shots.forEach((sh,i)=>{
+    dist-=sh.carry;
+    let off = sh.kind==="tee" ? (h.aim.tee||0) : sh.kind==="approach" ? (h.aim.green||0) : ((shots[i+1]&&shots[i+1].kind==="approach") ? (h.aim.layup||0) : 0);
+    pts.push(pointAtPx(c, Math.max(dist,0), off*K));
+  });
+  for (let i=1;i<pts.length;i++){
+    const a=pts[i-1], b=pts[i], len=Math.hypot(b.x-a.x,b.y-a.y), ux=(b.x-a.x)/len, uy=(b.y-a.y)/len;
+    s.push(`<line x1="${a.x+ux*7*U}" y1="${a.y+uy*7*U}" x2="${b.x-ux*13*U}" y2="${b.y-uy*13*U}" stroke="#0b1b2b" stroke-width="${1.8*U}" stroke-dasharray="${5*U} ${3.5*U}" marker-end="url(#arr${id})"/>`);
+    const side = (h.n===1)? -1 : 1;
+    const mx=(a.x+b.x)/2 + (-uy)*side*-18*U, my=(a.y+b.y)/2 + ux*side*-18*U;
+    labels.push(`<g><rect x="${mx-15*U}" y="${my-7.5*U}" width="${30*U}" height="${15*U}" rx="${7.5*U}" fill="#0b1b2b"/><text x="${mx}" y="${my+3.8*U}" text-anchor="middle" ${F} font-size="${10*U}" font-weight="700" fill="#fff">${shots[i-1].carry}</text></g>`);
+  }
+  pts.slice(1).forEach((p,i)=>{
+    const isG=i===pts.length-2;
+    s.push(`<ellipse cx="${p.x}" cy="${p.y}" rx="${(isG?11:15)*U}" ry="${(isG?8:10.5)*U}" transform="rotate(${p.ang||0} ${p.x} ${p.y})" fill="rgba(31,157,92,.35)" stroke="#1f9d5c" stroke-width="${1.6*U}"/>`);
+    labels.push(`<circle cx="${p.x}" cy="${p.y}" r="${6.5*U}" fill="#1f9d5c" stroke="#fff" stroke-width="${1.3*U}"/><text x="${p.x}" y="${p.y+3.6*U}" text-anchor="middle" ${F} font-size="${9.5*U}" font-weight="700" fill="#fff">${i+1}</text>`);
+  });
+  s.push(...labels);
+  s.push(`</svg>`);
+  return s.join("");
+}
+
+// ---------------- Cards ----------------
+function cardsFor(h, tee, drive){
+  const shots=plan(h,tee,drive);
+  const pill=(i)=>{ const sh=shots[i]; return sh.kind==="approach" ? `Shot ${i+1}: ${sh.carry} yd to the middle` : `Shot ${i+1}: ~${sh.carry} yd → leaves ${sh.left}`; };
+  const pills=[[],[],[]];
+  shots.forEach((sh,i)=>{
+    if (h.par===3){ pills[0].push(pill(i)); return; }
+    if (sh.kind==="tee") pills[0].push(pill(i));
+    else if (sh.kind==="approach") pills[(shots.length===2)?1:2].push(pill(i));
+    else pills[1].push(pill(i));
+  });
+  const titles = h.par===3 ? ["Tee shot","Club & line","On the green"] : ["Aim off the tee","Next shot","Into the green"];
+  const text=[h.steps.tee,h.steps.next,h.steps.green];
+  let html = text.map((t,i)=>`<div class="step"><div class="num">${i+1}</div><div><h3>${titles[i]}</h3><p>${t}</p>${pills[i].map(p=>`<span class="yd">${p}</span> `).join("")}</div></div>`).join("");
+  html += `<div class="avoid"><h3>Less favourable / give this space</h3><p>${h.avoid}</p></div>`;
+  return html;
+}
+function tableFor(h, tee, drive){
+  return `<tr><th>Tee</th><th>Yds</th><th>Shot plan (yd)</th><th>Shots</th></tr>` + Object.keys(h.tees).map(t=>{
+    const p=plan(h,t,drive);
+    return `<tr class="${t===tee?'sel':''}"><td>${t}</td><td>${h.tees[t]}</td><td>${p.map(x=>x.carry).join(" · ")}</td><td>${p.length}</td></tr>`;
+  }).join("");
+}
+
+// ---------------- Screen ----------------
+let state={hole:0, tee:"Black", drive:210};
+try{ const s=JSON.parse(localStorage.getItem("ssb-all")||"{}"); if (s.tee) state.tee=s.tee; if (s.drive) state.drive=s.drive; }catch(e){}
+const fromHash=()=>{ const m=location.hash.match(/^#hole-(\d+)$/); if (m){ const n=+m[1]; if (n>=1&&n<=18) state.hole=n-1; } };
+fromHash();
+
+function render(){
+  const h=HOLES[state.hole];
+  try{ localStorage.setItem("ssb-all", JSON.stringify({tee:state.tee, drive:state.drive})); }catch(e){}
+  document.getElementById("h-title").textContent = "HOLE "+String(h.n).padStart(2,"0");
+  document.getElementById("h-par").textContent = "PAR "+h.par;
+  document.getElementById("h-si").textContent = "Stroke index "+h.si;
+  document.getElementById("holes").innerHTML = HOLES.map((x,i)=>`<button data-hole="${i}" aria-pressed="${i===state.hole}" class="${x.traced?'traced':''}">${x.n}</button>`).join("");
+  document.getElementById("tees").innerHTML = Object.entries(h.tees).map(([t,y])=>`<button class="chip" aria-pressed="${t===state.tee}" data-tee="${t}"><span class="dot" style="background:${TEE_COLOURS[t]}"></span>${t} <span class="y">${y}</span></button>`).join("");
+  document.getElementById("drives").innerHTML = DRIVES.map(d=>`<button aria-pressed="${d===state.drive}" data-drive="${d}">${d}</button>`).join("");
+  const wrap=document.getElementById("mapwrap");
+  const pxW=Math.min(wrap.clientWidth-20, 440), pxH=Math.min(Math.max(window.innerHeight*0.5, 320), 470);
+  wrap.innerHTML = svgFor(h, state.tee, state.drive, pxW, pxH);
+  const b=document.getElementById("badge");
+  b.className = "badge"+(h.traced?"":" schem");
+  b.innerHTML = h.traced ? "<b>●</b> Traced from the Par The Course layout" : "<b>●</b> Schematic from the field guide – check the aerial";
+  document.getElementById("plan").innerHTML = cardsFor(h, state.tee, state.drive);
+  document.getElementById("tbl").innerHTML = tableFor(h, state.tee, state.drive);
+  document.getElementById("drv-lbl").textContent = state.drive;
+  document.getElementById("aerial").href = AERIAL(h.n);
+  const sel=document.querySelector('.holes button[aria-pressed=true]'); if (sel && sel.scrollIntoView) sel.scrollIntoView({block:"nearest", inline:"center"});
+}
+function go(i){ state.hole=(i+18)%18; try{ history.replaceState(null,"","#hole-"+(state.hole+1)); }catch(e){ location.hash="hole-"+(state.hole+1); } render(); window.scrollTo(0,0); }
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-tee]"); if (t){ state.tee=t.dataset.tee; render(); return; }
+  const d=e.target.closest("[data-drive]"); if (d){ state.drive=+d.dataset.drive; render(); return; }
+  const ho=e.target.closest("[data-hole]"); if (ho){ go(+ho.dataset.hole); return; }
+  const st=e.target.closest("[data-step]"); if (st){ go(state.hole + +st.dataset.step); return; }
+});
+window.addEventListener("hashchange", ()=>{ fromHash(); render(); });
+window.addEventListener("resize", render);
+// swipe left/right on the map to change hole
+let sx=null; document.getElementById("mapwrap").addEventListener("touchstart",e=>{sx=e.touches[0].clientX},{passive:true});
+document.getElementById("mapwrap").addEventListener("touchend",e=>{ if(sx===null)return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>60) go(state.hole+(dx<0?1:-1)); sx=null; });
+render();
+
+// ---------------- Print (all 18 holes, Black tee, 210 drive) ----------------
+function buildPrint(tee="Black", drive=210){
+  document.getElementById("print").innerHTML = HOLES.map(h=>`
+    <section class="ppage">
+      <header><div class="kicker">Team Europe / Streamsong Black</div>
+        <div class="titlerow"><h1>HOLE ${String(h.n).padStart(2,"0")}</h1><div class="par">PAR ${h.par}<small>Stroke index ${h.si} · ${Object.entries(h.tees).map(([t,y])=>t+" "+y).join(" · ")}</small></div></div></header>
+      <div class="sub">${tee} tee ${h.tees[tee]} yd · plan for a ${drive}-yd drive · ${h.traced?"map traced from the Par The Course layout":"schematic map from field-guide notes – check the aerial"}</div>
+      <div class="cols">
+        <div class="mapcard">${svgFor(h, tee, drive, 320, 760)}</div>
+        <div>
+          <div class="plan">${cardsFor(h, tee, drive)}</div>
+          <div class="section"><div class="lbl">Plan by tee (drive ${drive} yd)</div><table>${tableFor(h, tee, drive)}</table></div>
+          <div class="pfoot">Aerial: <a href="${AERIAL(h.n)}">${AERIAL(h.n).replace("https://www.","")}</a><br>Reference only. Today's flags, wind and caddie advice take priority.</div>
+        </div>
+      </div>
+    </section>`).join("");
+}
+buildPrint();
+</script>
+</body>
+</html>
