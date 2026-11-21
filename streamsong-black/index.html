@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Streamsong Black – 18-Hole Safe-Play Guide</title>
+<title>Streamsong – Team Europe Course Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -98,12 +98,27 @@
   .grid td.E{background:#1d4ed8;color:#fff;font-weight:700}.grid td.U{background:#c62828;color:#fff;font-weight:700}.grid td.H{background:#e5e7eb;font-weight:700}
   .grid td.cur{outline:2px solid var(--navy);outline-offset:-2px}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;z-index:20;display:none}
+  #home{display:none}
+  .home-hero{background:var(--navy);color:#fff;padding:22px 18px 20px}
+  .home-hero h1{font-size:42px;margin:4px 0 6px}
+  .home-hero p{margin:0;color:#b9c8d6;font-size:13.5px;line-height:1.4}
+  .days{padding:12px 12px 4px}
+  .day{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:14px 14px 12px;margin:0 0 10px;cursor:pointer;font-family:inherit;color:var(--ink);position:relative}
+  .day.today{border-color:var(--safe);box-shadow:0 0 0 2px rgba(31,157,92,.15)}
+  .day .dn{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .day .cn{font:700 30px 'Barlow Condensed',Arial Narrow,Arial,sans-serif;line-height:1.05;margin:2px 0 2px}
+  .day .meta{font-size:12.5px;color:var(--muted);padding-right:22px}
+  .day .pill{position:absolute;right:12px;top:12px;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:#eef3f8;color:var(--navy)}
+  .day.today .pill{background:var(--safe);color:#fff}
+  .day .res{margin-top:8px;font-size:12.5px;font-weight:600}
+  .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
+  .homebtn{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;cursor:pointer;margin-right:8px;letter-spacing:.02em}
   #print{display:none}
   @media print{
     .rc,.toast{display:none!important}
     @page{size:A4 portrait;margin:9mm}
     body{background:#fff}
-    #screen{display:none}
+    #screen,#home{display:none!important}
     #print{display:block}
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .ppage{break-after:page;page-break-after:always}
@@ -121,9 +136,14 @@
 </style>
 </head>
 <body>
+<div id="home" class="wrap">
+  <div class="home-hero"><div class="kicker">Team Europe · Streamsong Resort</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
+  <div class="days" id="days"></div>
+  <footer>Each day keeps its own scores on this phone. Course data: official and published scorecards; hole notes from the Team Europe field guide (Black) and published reviews (Bone Valley, Blue).</footer>
+</div>
 <div id="screen" class="wrap">
   <header>
-    <div class="kicker">Team Europe / Streamsong Black</div>
+    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span></div>
     <div class="titlerow">
       <h1 id="h-title">HOLE 01</h1>
       <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
@@ -147,10 +167,10 @@
   <div class="plan" id="plan"></div>
   <div class="section"><div class="lbl">Plan by tee (drive <span id="drv-lbl"></span> yd)</div><table id="tbl"></table></div>
   <a class="aerial" id="aerial" href="#" target="_blank" rel="noopener">
-    <div><b>Open the real aerial</b><small>allgolfholes.com – hole shape and distance overlay</small></div><div class="go">›</div>
+    <div><b id="lk-t">Open the real aerial</b><small id="lk-s">allgolfholes.com – hole shape and distance overlay</small></div><div class="go">›</div>
   </a>
-  <footer>
-    Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial. Plans assume a 16–18 handicap with a comfortable 2nd-shot limit of 190 yd. Today's flags, wind and caddie advice take priority.
+  <footer><span id="c-foot"></span>
+    <span style="display:none">Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial. </span> Plans assume a 16–18 handicap with a comfortable 2nd-shot limit of 190 yd. Today's flags, wind and caddie advice take priority.
   </footer>
 </div>
 <div id="print"></div>
@@ -166,7 +186,7 @@ const MAX_SECOND = 190, LAYUP_TARGET = 100;
 // ---------------- Course data ----------------
 // Generated holes: path = [[yards from green, lateral yards (+ = right)]...], fw = [[from,to,width,lat]], bunkers = [d,lat,w,h,label,side],
 // areas = {t:type, d1,d2, l1,l2, label}; aim = lateral yards for tee/layup/green targets.
-const HOLES = [
+const BLACK_HOLES = [
 { n:1, par:5, si:12, tees:{Green:573,Black:508,Silver:466,Gold:420}, traced:true,
   steps:{tee:"Centre-right fairway, staying left of the long waste area. Do not chase the bunkers on the left.",
          next:"Lay up in the playable left-centre area, past the left bunkers and away from the sand short-right of the green. Leave a comfortable wedge from about 100 yards.",
@@ -313,6 +333,247 @@ const HOLES = [
   areas:[{t:"water",d1:-10,d2:370,l1:30,l2:85,label:"Lake"}], aim:{tee:-12,layup:-10,green:-6}
 }];
 
+// ---------------- Bone Valley (David McLay Kidd, 2026) – official scorecard; notes from published reviews ----------------
+const BONE_HOLES = [
+{ n:1, par:4, si:5, tees:{Green:410,Black:390,Silver:350,Gold:290},
+  steps:{tee:"Wide landing area – swing freely, but favour centre-right, away from the lake on the left.", next:"Shallow, wide green: club for just past the flag and a couple of yards right of it (the local caddie line).", green:"Long-right misses roll back down the slope – that is the safe side. Anything left brings the lake in."},
+  avoid:"The lake down the left; dunes and native grass on the right.",
+  path:[[0,4],[200,0],[425,-4]], fw:[[30,290,50,0]], green:[22,12],
+  bunkers:[[12,-18,8,10]],
+  areas:[{t:"water",d1:10,d2:300,l1:-70,l2:-30,label:"Lake"},{t:"scrub",d1:60,d2:330,l1:30,l2:55,label:"Dunes & native"}], aim:{tee:5,green:3} },
+{ n:2, par:4, si:7, tees:{Green:445,Black:410,Silver:375,Gold:310}, layupOver:185, layupTo:100,
+  steps:{tee:"Drive down the right-centre – the hole bends gently right-to-left between a dune ridge (right) and a reedy lake (left).", next:"Approach to the LEFT of the flag and let the slope feed the ball across. If it is a long way, lay up to a full wedge.", green:"Centre of the green is a good result; do not short-side yourself on the lake side."},
+  avoid:"The reedy lake on the left and the dune ridge on the right.",
+  path:[[0,-24],[140,-20],[250,-4],[460,0]], fw:[[30,300,44,0]], green:[18,18],
+  bunkers:[[20,18,9,12]],
+  areas:[{t:"water",d1:110,d2:290,l1:-62,l2:-30,label:"Reedy lake"},{t:"scrub",d1:150,d2:330,l1:28,l2:52,label:"Dune ridge"}], aim:{tee:8,layup:-4,green:-4} },
+{ n:3, par:3, si:13, tees:{Green:200,Black:185,Silver:145,Gold:100},
+  steps:{tee:"Long par 3 framed by bunkers – take enough club.", next:"Short shots roll back down the front slope, so carry the ball to the middle.", green:"Middle of the green and two putts is a good score."},
+  avoid:"Bunkers on every side, and coming up short.",
+  path:[[0,0],[215,0]], fw:[], green:[17,17],
+  bunkers:[[22,-10,12,8,"Front bunkers","L"],[24,10,12,8],[2,-21,8,16],[2,21,8,16,"Side bunkers","R"]],
+  areas:[{t:"slope",d1:28,d2:46,l1:-12,l2:12,label:"Short rolls back"}], aim:{green:0} },
+{ n:4, par:5, si:9, tees:{Green:585,Black:540,Silver:500,Gold:410},
+  steps:{tee:"Find the fairway through the chute of grassy dunes – accuracy over distance.", next:"The hole then opens onto a huge field of sand. Lay up in the fairway to a comfortable wedge.", green:"Middle of the green – par 5s here are about avoiding the big number."},
+  avoid:"The grassy dunes off the tee and the vast sand areas beyond them.",
+  path:[[0,0],[600,0]], fw:[[0,430,44,0]], green:[17,19],
+  bunkers:[[25,-16,9,14],[10,18,9,14]],
+  areas:[{t:"scrub",d1:300,d2:470,l1:-48,l2:-24,label:"Grassy dunes"},{t:"scrub",d1:300,d2:470,l1:24,l2:48,label:""},{t:"waste",d1:60,d2:280,l1:26,l2:62,label:"Sand field"},{t:"waste",d1:90,d2:260,l1:-62,l2:-26,label:""}], aim:{tee:0,layup:-4,green:0} },
+{ n:5, par:4, si:1, tees:{Green:450,Black:420,Silver:395,Gold:300}, layBack:255, layupOver:170, layupTo:100,
+  steps:{tee:"Hardest hole on the card. A thin water hazard runs diagonally across the landing area – hit a club that stops SHORT of it.", next:"From short of the water, advance to a comfortable wedge rather than going for the green.", green:"Bogey is a good score here; aim at the middle."},
+  avoid:"The diagonal water across the landing area and the sand sweeping either side.",
+  path:[[0,0],[465,0]], fw:[[0,200,46,0],[250,330,46,0]], green:[17,19],
+  bunkers:[[18,-17,9,12]],
+  areas:[{t:"water",d1:205,d2:240,l1:-48,l2:48,label:"Thin water (diagonal)"},{t:"waste",d1:120,d2:380,l1:28,l2:62,label:"Sand sweep"},{t:"waste",d1:150,d2:350,l1:-62,l2:-28,label:""}], aim:{tee:-3,layup:0,green:0} },
+{ n:6, par:4, si:17, tees:{Green:355,Black:315,Silver:290,Gold:225}, layBack:100,
+  steps:{tee:"Tempting short par 4. Unless the green is an easy carry, lay back to a full wedge.", next:"A lay-up that is too short leaves a long bunker shot – go to your full-wedge yardage.", green:"Middle of the green; the greens here are small and contoured."},
+  avoid:"Coming up short in the bunkers in front of the green.",
+  path:[[0,0],[370,0]], fw:[[0,240,44,0]], green:[17,18],
+  bunkers:[[50,-10,22,10,"Bunkers short of green","R"],[62,12,14,9]],
+  areas:[], aim:{tee:-4,green:0} },
+{ n:7, par:3, si:15, tees:{Green:190,Black:165,Silver:145,Gold:130},
+  steps:{tee:"Tough par 3 – aim at the middle of the green, not the flag.", next:"Club for the carry to the centre; wind is a big factor on this exposed site.", green:"Two putts from the middle is a good score."},
+  avoid:"The bunkers around the green and short-siding yourself.",
+  path:[[0,0],[205,0]], fw:[], green:[16,16],
+  bunkers:[[20,-12,12,8,"Bunkers","L"],[4,21,8,16]],
+  areas:[], aim:{green:-2} },
+{ n:8, par:4, si:3, tees:{Green:495,Black:440,Silver:405,Gold:350}, layupOver:175, layupTo:100,
+  steps:{tee:"Long par 4 (stroke index 3). Find the fairway – no published hole detail yet, so take the caddie's line.", next:"If the green is out of range, lay up to your favourite wedge distance.", green:"Middle of the green; bogey is fine."},
+  avoid:"Sand in the landing zone and around the green.",
+  path:[[0,0],[510,0]], fw:[[0,330,46,0]], green:[17,19],
+  bunkers:[[240,-24,10,26,"Fairway bunkers","L"],[200,24,10,24],[20,-18,9,14],[18,18,9,14]],
+  areas:[], aim:{tee:3,layup:0,green:0} },
+{ n:9, par:5, si:11, tees:{Green:580,Black:545,Silver:530,Gold:410},
+  steps:{tee:"A 25-ft dune sits in the middle of the fairway. Take the side the caddie gives for today's pin – default to the left.", next:"Lay up into the 80-yard-wide stretch of short grass – this hole is a 'delayed par 3'.", green:"Bunkers, wetland and a mound guard the green – aim at the middle (there is a wooden bridge behind it)."},
+  avoid:"The centre dune, the wetland by the green and going long.",
+  path:[[0,0],[595,0]], fw:[[0,440,70,0]], green:[17,18],
+  bunkers:[[15,-16,9,12],[22,14,10,12]],
+  areas:[{t:"scrub",d1:255,d2:290,l1:-11,l2:11,label:"25-ft dune"},{t:"water",d1:-20,d2:35,l1:22,l2:55,label:"Wetland"}], aim:{tee:-17,layup:0,green:-4} },
+{ n:10, par:4, si:6, tees:{Green:415,Black:390,Silver:365,Gold:305}, layupOver:185, layupTo:100,
+  steps:{tee:"Solid par 4 (stroke index 6). Centre of the fairway – no published detail yet, so take the caddie's line.", next:"Play to the fat part of the green, or lay up if it is a long way.", green:"Small, contoured greens: leave the ball below the hole."},
+  avoid:"Going past the pin – the greens here are small with tiers and mounds.",
+  path:[[0,0],[430,0]], fw:[[0,300,46,0]], green:[17,18],
+  bunkers:[[220,22,10,24],[16,-18,9,12]],
+  areas:[], aim:{tee:-3,layup:0,green:0} },
+{ n:11, par:4, si:12, tees:{Green:380,Black:350,Silver:320,Gold:225},
+  steps:{tee:"Short par 4 – a strong drive is the key and leaves a short iron.", next:"The ball can spin back off the front edge, so take enough club for the middle.", green:"Middle of the green; don't spin it off the front."},
+  avoid:"The front edge (spin-back) and short-siding yourself.",
+  path:[[0,0],[395,0]], fw:[[0,290,46,0]], green:[16,17],
+  bunkers:[[18,-17,8,12],[14,18,8,12]],
+  areas:[], aim:{tee:0,green:0} },
+{ n:12, par:3, si:18, tees:{Green:150,Black:135,Silver:120,Gold:90},
+  steps:{tee:"Easiest hole on the card, but the green sits among dunes – wind can add a club.", next:"Small, deep pot bunkers guard the front: carry them to the middle.", green:"Centre of the green, two putts."},
+  avoid:"The pot bunkers in front of the green.",
+  path:[[0,0],[165,0]], fw:[], green:[14,14],
+  bunkers:[[16,-9,5,5],[18,0,5,5,"Pot bunkers","R"],[16,9,5,5]],
+  areas:[{t:"scrub",d1:-25,d2:40,l1:-48,l2:-24,label:"Dunes"},{t:"scrub",d1:-25,d2:40,l1:24,l2:48,label:""}], aim:{green:0} },
+{ n:13, par:4, si:2, tees:{Green:475,Black:445,Silver:420,Gold:365}, layupOver:175, layupTo:100,
+  steps:{tee:"Long par 4 (stroke index 2) where the course turns for home. Centre of the fairway.", next:"Treat it as a three-shot hole: lay up to a full wedge.", green:"Middle of the green; bogey is a solid score."},
+  avoid:"Forcing a long second into a small, contoured green.",
+  path:[[0,0],[490,0]], fw:[[0,330,48,0]], green:[17,19],
+  bunkers:[[230,23,10,28],[200,-24,10,22],[20,16,9,14]],
+  areas:[], aim:{tee:0,layup:0,green:0} },
+{ n:14, par:5, si:14, tees:{Green:520,Black:470,Silver:440,Gold:390}, noLand:[[110,220]],
+  steps:{tee:"Short par 5. Keep the drive in the fairway, short of the big diagonal ridge.", next:"The green shows through a 30-yard cut in the ridge: go through the gap to wedge range, or stop short of the ridge.", green:"Small green – aim at the middle. A good birdie chance."},
+  avoid:"The diagonal ridge of sand and long grass running from near-left to far-right.",
+  path:[[0,0],[535,0]], fw:[[0,380,50,0]], green:[16,18],
+  bunkers:[[14,-16,8,10]],
+  areas:[{t:"waste",d1:175,d2:215,l1:-50,l2:-9,label:"Diagonal ridge"},{t:"waste",d1:115,d2:155,l1:9,l2:50,label:""},{t:"slope",d1:115,d2:215,l1:-8,l2:8,label:"Gap"}], aim:{tee:0,layup:0,green:0} },
+{ n:15, par:4, si:16, tees:{Green:345,Black:305,Silver:280,Gold:200}, layBack:100,
+  steps:{tee:"Drivable par 4 – the smart play is a 3-wood or hybrid to a full wedge.", next:"Lay up to your full-wedge distance rather than chasing the green.", green:"Middle of the green."},
+  avoid:"Chasing the green and finding the sand and blowouts around it.",
+  path:[[0,0],[360,0]], fw:[[0,250,44,0]], green:[16,17],
+  bunkers:[[30,-14,10,12,"Greenside sand","L"],[12,18,9,12]],
+  areas:[], aim:{tee:0,green:0} },
+{ n:16, par:3, si:10, tees:{Green:205,Black:185,Silver:155,Gold:105},
+  steps:{tee:"Long downhill par 3 – take less club for the drop.", next:"A miss LEFT is the common error; aim at the centre-right of the green.", green:"Small tiered green: get on the right tier, then two putts."},
+  avoid:"The lakes behind the green and the miss left.",
+  path:[[0,0],[220,0]], fw:[], green:[13,19],
+  bunkers:[[6,-19,8,14],[6,19,8,14]],
+  areas:[{t:"water",d1:-55,d2:-22,l1:-45,l2:45,label:"Lakes behind"},{t:"scrub",d1:-20,d2:60,l1:-48,l2:-26,label:"Dunes"}], aim:{green:4} },
+{ n:17, par:4, si:4, tees:{Green:405,Black:365,Silver:340,Gold:240}, layupOver:180, layupTo:100,
+  steps:{tee:"Tee shot from among the reeds, uphill to a generous fairway – swing freely.", next:"Wetlands surround the approach; if the green is a long way, lay up to a full wedge.", green:"Middle of the green."},
+  avoid:"The wetlands either side of the green.",
+  path:[[0,0],[420,0]], fw:[[0,300,54,0]], green:[17,18],
+  bunkers:[],
+  areas:[{t:"water",d1:-15,d2:45,l1:-55,l2:-24,label:"Wetlands"},{t:"water",d1:-15,d2:45,l1:24,l2:55,label:""}], aim:{tee:0,layup:0,green:0} },
+{ n:18, par:5, si:8, tees:{Green:585,Black:545,Silver:500,Gold:410},
+  steps:{tee:"A good drive that catches the fairway downslope gets extra run.", next:"Lay up centre-left; avoid a poor second up the slope on the left.", green:"The low green sits beside the lake on the right – aim middle-left."},
+  avoid:"The lake by the green on the right and the up-slope on the left.",
+  path:[[0,0],[600,0]], fw:[[0,440,48,0]], green:[17,18],
+  bunkers:[[30,-18,9,14]],
+  areas:[{t:"water",d1:-15,d2:120,l1:24,l2:70,label:"Lake"}], aim:{tee:0,layup:-6,green:-4} }
+];
+
+// ---------------- Streamsong Blue (Tom Doak, 2012) – scorecard; notes from published hole-by-hole reviews ----------------
+const BLUE_HOLES = [
+{ n:1, par:4, si:14, tees:{Green:338,Black:330,Silver:330,Gold:289}, layBack:140,
+  steps:{tee:"Highest tee on the property, so it plays shorter. A long iron or hybrid stays short of the fairway bunkers.", next:"Approach to the middle; the green has run-off all round.", green:"Aim at the centre and accept a long putt."},
+  avoid:"Fairway bunkers on both sides, the lone bunker left of the green and the big dune right.",
+  path:[[0,0],[350,0]], fw:[[30,250,50,0]], green:[18,19],
+  bunkers:[[150,-24,12,30,"Fairway bunkers","L"],[165,24,12,30],[8,-20,9,14]],
+  areas:[{t:"scrub",d1:-10,d2:40,l1:22,l2:48,label:"Big dune"}], aim:{tee:0,green:0} },
+{ n:2, par:5, si:10, tees:{Green:554,Black:530,Silver:516,Gold:459},
+  steps:{tee:"Wide fairway – pick the side that matches today's pin (left pin, left side).", next:"Reachable only with wind help; otherwise lay up to a committed line and control the distance.", green:"A deep bunker splits the green in two – play to the half with the pin, or to the bigger half."},
+  avoid:"The deep bunker in the middle of the green complex.",
+  path:[[0,0],[570,0]], fw:[[0,420,56,0]], green:[22,18],
+  bunkers:[[10,0,8,14,"Bunker splits the green","R"],[26,-20,9,14]],
+  areas:[], aim:{tee:0,layup:0,green:-6} },
+{ n:3, par:4, si:8, tees:{Green:418,Black:370,Silver:359,Gold:339},
+  steps:{tee:"Plenty of room RIGHT off the tee. Left is shorter, but it brings the lake into play.", next:"Plateau green with steep run-off at the front and right; bunker and lake on the left.", green:"Miss right of the green rather than left, and don't chase a back pin."},
+  avoid:"The lake running diagonally down the left.",
+  path:[[0,0],[435,0]], fw:[[25,290,48,4]], green:[18,18],
+  bunkers:[[12,-16,8,12]],
+  areas:[{t:"water",d1:20,d2:250,l1:-62,l2:-26,label:"Lake (diagonal)"}], aim:{tee:8,green:4} },
+{ n:4, par:4, si:4, tees:{Green:442,Black:417,Silver:369,Gold:325}, layupOver:185, layupTo:100,
+  steps:{tee:"Climbs a ridge. Favour the LEFT side for the approach angle, but don't flare right into the deep grass.", next:"Deep bunkers front-left and front-right: carry them to the middle, or lay up to a wedge.", green:"The green slopes back to front – stay below the hole."},
+  avoid:"The deep grass right and the deep front bunkers.",
+  path:[[0,0],[460,0]], fw:[[0,320,48,0]], green:[18,19],
+  bunkers:[[22,-15,10,14,"Deep bunkers","L"],[22,15,10,14]],
+  areas:[{t:"scrub",d1:100,d2:320,l1:28,l2:52,label:"Deep grass"}], aim:{tee:-6,layup:-3,green:0} },
+{ n:5, par:3, si:16, tees:{Green:157,Black:121,Silver:115,Gold:102},
+  steps:{tee:"Short par 3 to a raised green that is 74 yards deep – club by the pin; wind changes everything.", next:"The back half funnels right into a bowl, the front half to the middle – use the slopes.", green:"Get on the right section, then two putts."},
+  avoid:"Being on the wrong section of the very deep green.",
+  path:[[0,0],[175,0]], fw:[], green:[14,30],
+  bunkers:[[34,-16,8,12],[18,18,8,12]],
+  areas:[], aim:{green:0} },
+{ n:6, par:4, si:18, tees:{Green:345,Black:317,Silver:295,Gold:267}, layBack:110,
+  steps:{tee:"Short par 4 with lots of fairway bunkers – place it, don't bomb it (reachable only downwind).", next:"The green sits in a valley with run-off all round; a full wedge gives the most control.", green:"Middle of the green; long putts are common."},
+  avoid:"The fairway bunkers and the big dune behind the green.",
+  path:[[0,0],[360,0]], fw:[[0,260,46,0]], green:[18,18],
+  bunkers:[[160,-12,10,12,"Fairway bunkers","L"],[185,14,10,12],[205,-4,10,10]],
+  areas:[{t:"scrub",d1:-45,d2:-18,l1:-32,l2:32,label:"Big dune behind"}], aim:{tee:-2,green:0} },
+{ n:7, par:3, si:12, tees:{Green:203,Black:188,Silver:176,Gold:97},
+  steps:{tee:"Signature hole over the lake. Aim RIGHT-centre: the green slopes hard right to left and feeds shots back.", next:"If unsure of the carry, club up – the only really bad miss is the water.", green:"From the right side, let the slope work toward the hole."},
+  avoid:"The lake in front and the dunes behind.",
+  path:[[0,0],[218,0]], fw:[], green:[18,16],
+  bunkers:[[2,-20,8,14]],
+  areas:[{t:"water",d1:26,d2:92,l1:-48,l2:48,label:"Lake"},{t:"scrub",d1:-42,d2:-16,l1:-40,l2:40,label:"Dunes behind"}], aim:{green:6} },
+{ n:8, par:4, si:2, tees:{Green:454,Black:414,Silver:338,Gold:308}, layupOver:180, layupTo:100,
+  steps:{tee:"Downhill. Play just RIGHT of the centreline bunker – the right side gives the better angle.", next:"Elevated green with a big false front – take an extra club, or lay up to a wedge if it is out of range.", green:"Multi-tiered green: centre of the green, two putts."},
+  avoid:"The centreline bunker, the greenside bunkers and pond, and coming up short on the false front.",
+  path:[[0,0],[470,0]], fw:[[0,320,50,0]], green:[18,19],
+  bunkers:[[202,0,12,18,"Centre bunker","L"],[16,-18,9,14],[16,18,9,14]],
+  areas:[{t:"water",d1:34,d2:60,l1:-36,l2:-18,label:"Pond"},{t:"slope",d1:8,d2:18,l1:-14,l2:14,label:""}], aim:{tee:12,layup:3,green:0} },
+{ n:9, par:5, si:6, tees:{Green:575,Black:541,Silver:510,Gold:453},
+  steps:{tee:"Blind tee shot: carry just over the left edge of the bunkers, away from the trees on the left.", next:"The lay-up is fairly benign – take a club that leaves a full wedge.", green:"Uphill, shallow green that slopes hard back to front – stay below the hole."},
+  avoid:"The big fairway bunker, the trees left and the deep bunkers in front of the green.",
+  path:[[0,0],[590,0]], fw:[[0,440,56,0]], green:[22,15],
+  bunkers:[[300,-14,16,30,"Big fairway bunker","L"],[16,-12,10,10],[16,12,10,10]],
+  areas:[{t:"scrub",d1:260,d2:440,l1:-62,l2:-34,label:"Trees"}], aim:{tee:6,layup:0,green:0} },
+{ n:10, par:3, si:15, tees:{Green:187,Black:161,Silver:129,Gold:103},
+  steps:{tee:"Mid-length par 3; the big front bunker is not really in play.", next:"The green sits diagonally between bunkers and the front-right slopes away – favour middle-left.", green:"Two putts from the middle."},
+  avoid:"Short-right, where the green slopes away.",
+  path:[[0,0],[200,0]], fw:[], green:[19,15],
+  bunkers:[[24,-4,24,8,"Front bunker","R"],[2,-22,8,14],[-4,20,8,12]],
+  areas:[], aim:{green:-3} },
+{ n:11, par:4, si:1, tees:{Green:487,Black:454,Silver:427,Gold:386}, layupOver:170, layupTo:100,
+  steps:{tee:"Hardest hole. Wide, flat landing – the RIGHT side is safer. A pot bunker sits mid-fairway (about 260 from the back tee).", next:"Treat it as a three-shot hole: lay up to a full wedge.", green:"Long, narrow green with no bunkers, just rolls – aim at the middle and lag."},
+  avoid:"The pot bunker in mid-fairway and the fairway bunkers down the left.",
+  path:[[0,0],[500,0]], fw:[[0,330,52,0]], green:[13,24],
+  bunkers:[[228,0,6,6,"Pot bunker","R"],[255,-24,10,40,"Fairway bunkers","L"]],
+  areas:[], aim:{tee:9,layup:0,green:0} },
+{ n:12, par:4, si:11, tees:{Green:408,Black:390,Silver:351,Gold:317}, layupOver:185, layupTo:100,
+  steps:{tee:"Thread the drive between the fairway bunkers – the middle is enough. The water is not in play off the tee.", next:"Water and sand guard the approach – take enough club for the middle.", green:"The most undulating green on the course; stay out of the severe back section."},
+  avoid:"Fairway bunkers on both sides, the water by the approach and going long.",
+  path:[[0,0],[425,0]], fw:[[0,300,40,0]], green:[18,19],
+  bunkers:[[200,-22,10,22],[210,22,10,22,"Fairway bunkers","R"],[-14,0,12,7,"Back bunker","R"]],
+  areas:[{t:"water",d1:15,d2:70,l1:-56,l2:-20,label:"Water & sand"}], aim:{tee:0,green:0} },
+{ n:13, par:4, si:17, tees:{Green:312,Black:293,Silver:279,Gold:247}, layBack:110,
+  steps:{tee:"Drivable but risky. Take an iron down the RIGHT side for a clear look at the green.", next:"Wedge or short iron into a narrow, flat green.", green:"Favour the right half – the deep bunkers on the left are 'jail'."},
+  avoid:"The very deep bunkers left of the green.",
+  path:[[0,0],[328,0]], fw:[[0,230,44,0]], green:[13,17],
+  bunkers:[[10,-18,10,14,"Deep bunkers – 'jail'","L"],[26,-15,8,10]],
+  areas:[], aim:{tee:8,green:3} },
+{ n:14, par:5, si:9, tees:{Green:545,Black:510,Silver:489,Gold:452},
+  steps:{tee:"The lake in front of the back tees is just a carry; the fairway beyond is generous.", next:"On the lay-up, avoid the small pot bunker right and the massive bunker left.", green:"Small green with run-off – a centre-green wedge is the play."},
+  avoid:"The bunkers either side of the lay-up area.",
+  path:[[0,0],[560,0]], fw:[[0,420,52,0]], green:[15,16],
+  bunkers:[[230,24,10,18,"Ridge bunker","R"],[132,14,5,5],[122,-24,14,26,"Massive bunker","L"]],
+  areas:[], aim:{tee:0,layup:0,green:0} },
+{ n:15, par:4, si:7, tees:{Green:446,Black:398,Silver:357,Gold:341}, layupOver:185, layupTo:100,
+  steps:{tee:"Ample room off the tee – stay right of the blowout bunker on the left.", next:"A dune and bunkers mid-fairway hide the green, so take the line from the caddie or yardage book.", green:"The green slopes hard left to right: aim left-centre and let it feed."},
+  avoid:"The blowout on the left and the deep bunkers at the punchbowl front.",
+  path:[[0,0],[460,0]], fw:[[0,320,48,0]], green:[18,19],
+  bunkers:[[215,-20,14,22,"Blowout bunker","L"],[140,0,14,14,"Dune & bunkers","R"],[15,-14,9,12],[15,14,9,12]],
+  areas:[], aim:{tee:6,layup:-4,green:-5} },
+{ n:16, par:3, si:13, tees:{Green:237,Black:215,Silver:188,Gold:165},
+  steps:{tee:"Long par 3 to a green that is hard to see. Aim LEFT-centre – shots left bounce back toward the middle.", next:"If you can't reach it comfortably, play short-left and pitch on.", green:"The green slopes left to right; the back-left section is its own plateau."},
+  avoid:"The treacherous bunkers on the right.",
+  path:[[0,0],[252,0]], fw:[], green:[18,18],
+  bunkers:[[5,22,12,26,"Treacherous bunkers","R"],[30,-17,8,10]],
+  areas:[], aim:{green:-6} },
+{ n:17, par:5, si:5, tees:{Green:690,Black:590,Silver:525,Gold:498}, noLand:[[405,445]],
+  steps:{tee:"'Hit it anywhere but left.' From the Black tee the drive must carry the Great Hazard (about 145–185 yd).", next:"Miles of room for the second; several bunkers sit around the lay-up zone.", green:"Uphill, partly blind approach with a false front – take an extra club."},
+  avoid:"Left off the tee, the Great Hazard and the front bunker.",
+  path:[[0,0],[705,0]], fw:[[0,400,54,0],[450,560,54,0]], green:[17,18],
+  bunkers:[[230,-20,12,20],[200,18,10,18],[25,-6,14,8,"Front bunker","L"]],
+  areas:[{t:"waste",d1:405,d2:445,l1:-55,l2:55,label:"Great Hazard"}], aim:{tee:6,layup:5,green:0} },
+{ n:18, par:4, si:3, tees:{Green:478,Black:453,Silver:439,Gold:364}, layupOver:175, layupTo:100,
+  steps:{tee:"Uphill tee shot. The right side is shorter but brings the bunkers in – favour left-centre.", next:"Over the crest the green appears. If it's out of range, lay up to a full wedge.", green:"The green slopes hard left to right – land it on the left half and let it feed."},
+  avoid:"The bunkers down the right, and long approaches from the left side.",
+  path:[[0,0],[495,0]], fw:[[0,330,52,0]], green:[18,19],
+  bunkers:[[230,22,12,34,"Bunkers","R"],[200,20,10,20]],
+  areas:[], aim:{tee:-6,layup:-3,green:-6} }
+];
+
+const COURSES = {
+  black:{ key:"black", name:"Black", full:"Streamsong Black", day:1, date:"2026-11-20", label:"Fri 20 Nov", designer:"Gil Hanse", par:73, len:"6,747 yd from the Black tees",
+    link:n=>AERIAL(n), linkTitle:"Open the real aerial", linkSub:"allgolfholes.com – hole shape and distance overlay",
+    foot:"Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial.",
+    holes:BLACK_HOLES },
+  bone:{ key:"bone", name:"Bone Valley", full:"Streamsong Bone Valley", day:2, date:"2026-11-21", label:"Sat 21 Nov", designer:"David McLay Kidd · opened 2026", par:72, len:"6,600 yd from the Black tees",
+    link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
+    foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong – aim away from flags and let the slopes feed the ball.",
+    holes:BONE_HOLES },
+  blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
+    link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
+    foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
+    holes:BLUE_HOLES }
+};
+const COURSE_ORDER=["black","bone","blue"];
+let HOLES = BLACK_HOLES;
+
 // ---------------- Geometry helpers ----------------
 function pointAtPx(c, d, off=0){
   let acc=0;
@@ -408,7 +669,7 @@ function build(h){
   g.view=[minX, minY, Math.max(maxX-minX, 300), maxY-minY];
   h.geo = g;
 }
-HOLES.forEach(build);
+[BLACK_HOLES,BONE_HOLES,BLUE_HOLES].forEach(a=>a.forEach(build));
 
 // ---------------- Shot plan ----------------
 function plan(h, tee, drive){
@@ -476,7 +737,7 @@ function svgFor(h, tee, drive, pxW, pxH){
     });
   } else {
     s.push(`<path d="${g.native}" fill="#b49a6a" opacity=".5"/><path d="${g.rough}" fill="#8db36a"/>`);
-    g.areas.forEach(a=>{
+    const drawAreas=()=>g.areas.forEach(a=>{
       const fill = a.t==="water" ? "#7fb6d9" : a.t==="scrub" ? `url(#scrub${id})` : a.t==="rise" ? `url(#rise${id})` : a.t==="native" ? `url(#native${id})` : a.t==="slope" ? "rgba(31,157,92,.25)" : `url(#sand${id})`;
       const stroke = a.t==="water" ? "#5d97bd" : a.t==="slope" ? "#1f9d5c" : "#cbb98a";
       if (a.t!=="native" && a.t!=="slope") s.push(`<path d="${a.d}" fill="none" stroke="#e3a33b" stroke-width="${5*U}" stroke-opacity=".55" stroke-linejoin="round"/>`);
@@ -489,6 +750,7 @@ function svgFor(h, tee, drive, pxW, pxH){
     });
     s.push(`<path d="${g.tee}" fill="#86c062" stroke="#6aa64a" stroke-width="2"/>`);
     g.fw.forEach(f=>s.push(`<path d="${f}" fill="url(#mow${id})" stroke="#5e963c" stroke-width="2"/>`));
+    drawAreas();
     s.push(`<path d="${g.green}" fill="#a6db7c" stroke="#7fbf55" stroke-width="3"/>`);
     if (h.doubleGreen) labels.push(label(pointAtPx(c,0,0).x, pointAtPx(c,0,0).y-(h.green[1]*K+8*U), "Double green – check today's flag", "middle", "#17784a"));
     g.bunkers.forEach(b=>{
@@ -531,7 +793,7 @@ function svgFor(h, tee, drive, pxW, pxH){
   for (let i=1;i<pts.length;i++){
     const a=pts[i-1], b=pts[i], len=Math.hypot(b.x-a.x,b.y-a.y), ux=(b.x-a.x)/len, uy=(b.y-a.y)/len;
     s.push(`<line x1="${a.x+ux*7*U}" y1="${a.y+uy*7*U}" x2="${b.x-ux*13*U}" y2="${b.y-uy*13*U}" stroke="#0b1b2b" stroke-width="${1.8*U}" stroke-dasharray="${5*U} ${3.5*U}" marker-end="url(#arr${id})"/>`);
-    const side = (h.n===1)? -1 : 1;
+    const side = h.traced ? -1 : 1;
     const mx=(a.x+b.x)/2 + (-uy)*side*-18*U, my=(a.y+b.y)/2 + ux*side*-18*U;
     labels.push(`<g><rect x="${mx-15*U}" y="${my-7.5*U}" width="${30*U}" height="${15*U}" rx="${7.5*U}" fill="#0b1b2b"/><text x="${mx}" y="${my+3.8*U}" text-anchor="middle" ${F} font-size="${10*U}" font-weight="700" fill="#fff">${shots[i-1].carry}</text></g>`);
   }
@@ -570,9 +832,16 @@ function tableFor(h, tee, drive){
 }
 
 // ---------------- Screen ----------------
-let state={hole:0, tee:"Black", drive:210};
+let state={hole:0, tee:"Black", drive:210, course:"black", view:"home"};
 try{ const s=JSON.parse(localStorage.getItem("ssb-all")||"{}"); if (s.tee) state.tee=s.tee; if (s.drive) state.drive=s.drive; }catch(e){}
-const fromHash=()=>{ const m=location.hash.match(/^#hole-(\d+)$/); if (m){ const n=+m[1]; if (n>=1&&n<=18) state.hole=n-1; } };
+const fromHash=()=>{
+  const h=location.hash;
+  let m=h.match(/^#(black|bone|blue)-hole-(\d+)$/);
+  if (m){ state.course=m[1]; state.view="course"; const n=+m[2]; if (n>=1&&n<=18) state.hole=n-1; return; }
+  m=h.match(/^#(black|bone|blue)$/); if (m){ state.course=m[1]; state.view="course"; state.hole=0; return; }
+  m=h.match(/^#hole-(\d+)$/); if (m){ state.course="black"; state.view="course"; const n=+m[1]; if (n>=1&&n<=18) state.hole=n-1; return; }
+  state.view="home";
+};
 fromHash();
 
 
@@ -582,9 +851,22 @@ function defaultMatches(){
   return { open:true, setup:false, net:true, count:1, single:true, teams:["Europe","USA"],
     m:[0,1].map(i=>({ players:[[`EU ${i*2+1}`,`EU ${i*2+2}`],[`US ${i*2+1}`,`US ${i*2+2}`]], hcp:[[18,18],[18,18]], scores:{} })) };
 }
-let RC = defaultMatches();
-try{ const saved=JSON.parse(localStorage.getItem("ssb-rc")||"null"); if (saved && saved.m) RC=Object.assign(defaultMatches(), saved); }catch(e){}
-const saveRC=()=>{ try{ localStorage.setItem("ssb-rc", JSON.stringify(RC)); }catch(e){} };
+function loadRC(key){
+  let r=defaultMatches();
+  try{
+    let saved=JSON.parse(localStorage.getItem("ssb-rc-"+key)||"null");
+    if (!saved && key==="black") saved=JSON.parse(localStorage.getItem("ssb-rc")||"null");   // scores from day 1, before multi-course
+    if (saved && saved.m) r=Object.assign(defaultMatches(), saved);
+    else if (key!=="black"){ // carry team names / format over from the previous day
+      const prev=JSON.parse(localStorage.getItem("ssb-rc-"+COURSE_ORDER[COURSE_ORDER.indexOf(key)-1])||localStorage.getItem("ssb-rc")||"null");
+      if (prev){ r.teams=prev.teams||r.teams; r.single=prev.single!==undefined?prev.single:r.single; r.count=prev.count||1; r.net=prev.net!==undefined?prev.net:r.net;
+        if (prev.m) prev.m.forEach((pm,i)=>{ if (r.m[i]){ r.m[i].players=pm.players; r.m[i].hcp=pm.hcp; } }); }
+    }
+  }catch(e){}
+  return r;
+}
+let RC = loadRC(state.course), RC_KEY = state.course;
+const saveRC=()=>{ try{ localStorage.setItem("ssb-rc-"+RC_KEY, JSON.stringify(RC)); }catch(e){} };
 const toast=t=>{ const el=document.getElementById("toast"); el.textContent=t; el.style.display="block"; clearTimeout(toast._t); toast._t=setTimeout(()=>el.style.display="none",1800); };
 
 function strokesFor(match, side, p, hole){
@@ -674,7 +956,7 @@ function renderRC(){
 
 function rcText(){
   const st=ACT().map(matchStatus), tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
-  let t=`Streamsong Black – best ball\n${RC.teams[0]} ${fmtPts(tot[0])} – ${fmtPts(tot[1])} ${RC.teams[1]}\n`;
+  let t=`${COURSES[state.course].full} – best ball\n${RC.teams[0]} ${fmtPts(tot[0])} – ${fmtPts(tot[1])} ${RC.teams[1]}\n`;
   ACT().forEach((m,i)=>{ t+= RC.single ? `\n${(RC.count||1)>1?`Match ${i+1}: `:""}${st[i].text}\n` : `\nMatch ${i+1}: ${m.players[0].join(" & ")} v ${m.players[1].join(" & ")}\n${st[i].text}\n`;
     let line=""; for(let n=1;n<=18;n++){ const r=st[i].res[n]; line+= !r||!r.done?"·":r.winner===0?RC.teams[0][0]:r.winner===1?RC.teams[1][0]:"½"; if(n===9) line+=" | "; } t+=line+"\n"; });
   return t;
@@ -705,7 +987,7 @@ document.getElementById("rc").addEventListener("click", e=>{
   }
   else if (act==="goto"){ go(+b.dataset.h-1); return; }
   else if (act==="copy"){ const t=rcText(); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Results copied – paste into WhatsApp")).catch(()=>{ window.prompt("Copy the results:", t); }); return; }
-  else if (act==="csv"){ const blob=new Blob([rcCSV()],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`streamsong-rydercup-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast("CSV downloaded"); return; }
+  else if (act==="csv"){ const blob=new Blob([rcCSV()],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`streamsong-${state.course}-scores-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast("CSV downloaded"); return; }
   else if (act==="clearhole"){ ACT().forEach(m=>delete m.scores[hole]); toast(`Hole ${hole} cleared`); }
   else if (act==="reset"){ if (b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Tap again to reset"; return; } RC.m.forEach(m=>m.scores={}); toast("All scores reset"); }
   saveRC(); renderRC();
@@ -720,7 +1002,37 @@ document.getElementById("rc").addEventListener("change", e=>{
   saveRC(); renderRC();
 });
 
+function setCourse(key){
+  if (!COURSES[key]) key="black";
+  state.course=key; HOLES=COURSES[key].holes;
+  if (RC_KEY!==key){ RC=loadRC(key); RC_KEY=key; }
+}
+function renderHome(){
+  const today=new Date(); const iso=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  document.getElementById("days").innerHTML = COURSE_ORDER.map(k=>{
+    const c=COURSES[k]; const isToday=c.date===iso, past=c.date<iso;
+    const pill = isToday?"Today": past?"Played":"Day "+c.day;
+    let res="";
+    try{ const r=loadRC(k); const saved=localStorage.getItem("ssb-rc-"+k)||(k==="black"?localStorage.getItem("ssb-rc"):null);
+      if (saved){ const prevRC=RC, prevH=HOLES; RC=r; HOLES=c.holes; const st=r.m.slice(0,r.count||1).map(matchStatus); RC=prevRC; HOLES=prevH;
+        const t=st.map(x=>x.text).filter(x=>x!=="Not started"); if (t.length) res=t.join(" · "); } }catch(e){}
+    return `<button class="day ${isToday?'today':''}" data-course="${k}"><span class="pill">${pill}</span>
+      <div class="dn">Day ${c.day} · ${c.label}</div><div class="cn">${c.full.toUpperCase()}</div>
+      <div class="meta">${c.designer} · Par ${c.par} · ${c.len}</div>${res?`<div class="res">${res}</div>`:""}<span class="go">›</span></button>`;
+  }).join("");
+}
 function render(){
+  const isHome = state.view==="home";
+  document.getElementById("home").style.display = isHome?"block":"none";
+  document.getElementById("screen").style.display = isHome?"none":"block";
+  if (isHome){ renderHome(); document.title="Streamsong – Team Europe Course Guide"; return; }
+  setCourse(state.course);
+  const C=COURSES[state.course];
+  document.title=`${C.full} – Hole ${state.hole+1}`;
+  document.getElementById("h-kicker").textContent = `Day ${C.day} · ${C.full}`;
+  document.getElementById("lk-t").textContent = C.linkTitle;
+  document.getElementById("lk-s").textContent = C.linkSub;
+  document.getElementById("c-foot").textContent = C.foot;
   const h=HOLES[state.hole];
   try{ localStorage.setItem("ssb-all", JSON.stringify({tee:state.tee, drive:state.drive})); }catch(e){}
   renderRC();
@@ -735,15 +1047,18 @@ function render(){
   wrap.innerHTML = svgFor(h, state.tee, state.drive, pxW, pxH);
   const b=document.getElementById("badge");
   b.className = "badge"+(h.traced?"":" schem");
-  b.innerHTML = h.traced ? "<b>●</b> Traced from the Par The Course layout" : "<b>●</b> Schematic from the field guide – check the aerial";
+  b.innerHTML = h.traced ? "<b>●</b> Traced from the Par The Course layout" : state.course==="black" ? "<b>●</b> Schematic from the field guide – check the aerial" : "<b>●</b> Schematic from published notes – check the yardage book";
   document.getElementById("plan").innerHTML = cardsFor(h, state.tee, state.drive);
   document.getElementById("tbl").innerHTML = tableFor(h, state.tee, state.drive);
   document.getElementById("drv-lbl").textContent = state.drive;
-  document.getElementById("aerial").href = AERIAL(h.n);
+  document.getElementById("aerial").href = C.link(h.n);
   const sel=document.querySelector('.holes button[aria-pressed=true]'); if (sel && sel.scrollIntoView) sel.scrollIntoView({block:"nearest", inline:"center"});
 }
-function go(i){ state.hole=(i+18)%18; try{ history.replaceState(null,"","#hole-"+(state.hole+1)); }catch(e){ location.hash="hole-"+(state.hole+1); } render(); window.scrollTo(0,0); }
+function go(i){ state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
+function goHome(){ state.view="home"; try{ history.replaceState(null,"","#home"); }catch(e){ location.hash="home"; } render(); window.scrollTo(0,0); }
 document.addEventListener("click", e=>{
+  const hb=e.target.closest("[data-home]"); if (hb){ goHome(); return; }
+  const cb=e.target.closest("[data-course]"); if (cb){ setCourse(cb.dataset.course); state.hole=0; go(0); return; }
   const t=e.target.closest("[data-tee]"); if (t){ state.tee=t.dataset.tee; render(); return; }
   const d=e.target.closest("[data-drive]"); if (d){ state.drive=+d.dataset.drive; render(); return; }
   const ho=e.target.closest("[data-hole]"); if (ho){ go(+ho.dataset.hole); return; }
@@ -754,26 +1069,29 @@ window.addEventListener("resize", ()=>{ if (!document.activeElement || !document
 // swipe left/right on the map to change hole
 let sx=null; document.getElementById("mapwrap").addEventListener("touchstart",e=>{sx=e.touches[0].clientX},{passive:true});
 document.getElementById("mapwrap").addEventListener("touchend",e=>{ if(sx===null)return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>60) go(state.hole+(dx<0?1:-1)); sx=null; });
+setCourse(state.course);
 render();
 
 // ---------------- Print (all 18 holes, Black tee, 210 drive) ----------------
 function buildPrint(tee="Black", drive=210){
+  const C=COURSES[state.course]; setCourse(state.course);
   document.getElementById("print").innerHTML = HOLES.map(h=>`
     <section class="ppage">
-      <header><div class="kicker">Team Europe / Streamsong Black</div>
+      <header><div class="kicker">Team Europe / ${C.full} · Day ${C.day} · ${C.label}</div>
         <div class="titlerow"><h1>HOLE ${String(h.n).padStart(2,"0")}</h1><div class="par">PAR ${h.par}<small>Stroke index ${h.si} · ${Object.entries(h.tees).map(([t,y])=>t+" "+y).join(" · ")}</small></div></div></header>
-      <div class="sub">${tee} tee ${h.tees[tee]} yd · plan for a ${drive}-yd drive · ${h.traced?"map traced from the Par The Course layout":"schematic map from field-guide notes – check the aerial"}</div>
+      <div class="sub">${tee} tee ${h.tees[tee]} yd · plan for a ${drive}-yd drive · ${h.traced?"map traced from the Par The Course layout":state.course==="black"?"schematic map from field-guide notes – check the aerial":"schematic map from published notes – check the yardage book"}</div>
       <div class="cols">
         <div class="mapcard">${svgFor(h, tee, drive, 320, 760)}</div>
         <div>
           <div class="plan">${cardsFor(h, tee, drive)}</div>
           <div class="section"><div class="lbl">Plan by tee (drive ${drive} yd)</div><table>${tableFor(h, tee, drive)}</table></div>
-          <div class="pfoot">Aerial: <a href="${AERIAL(h.n)}">${AERIAL(h.n).replace("https://www.","")}</a><br>Reference only. Today's flags, wind and caddie advice take priority.</div>
+          <div class="pfoot">${C.linkTitle}: <a href="${C.link(h.n)}">${C.link(h.n).replace("https://www.","")}</a><br>Reference only. Today's flags, wind and caddie advice take priority.</div>
         </div>
       </div>
     </section>`).join("");
 }
 buildPrint();
+window.addEventListener("beforeprint", ()=>buildPrint());
 </script>
 </body>
 </html>
