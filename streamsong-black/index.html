@@ -1100,13 +1100,13 @@ const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""
 
 
 // ---------------- Team PINs ----------------
-const getPin=(side,m)=>{ try{ return localStorage.getItem("ssb-pin-"+side+"-"+m); }catch(e){ return null; } };
-const setPin=(side,m,v)=>{ try{ v==null?localStorage.removeItem("ssb-pin-"+side+"-"+m):localStorage.setItem("ssb-pin-"+side+"-"+m,v); }catch(e){} };
-const anyPin=()=>getPin(0,0)||getPin(0,1)||getPin(1,0)||getPin(1,1);
+const getPin=(side,m)=>{ try{ return localStorage.getItem("ssb-mpin-"+m); }catch(e){ return null; } };
+const setPin=(side,m,v)=>{ try{ v==null?localStorage.removeItem("ssb-mpin-"+m):localStorage.setItem("ssb-mpin-"+m,v); }catch(e){} };
+const anyPin=()=>getPin(0,0)||getPin(0,1);
 function askPin(side, m, done){
-  const who = side<0 ? "your team" : teamName(RC.m[m]||{players:[]}, m, side);
+  const who = side<0 ? "your match" : `Match ${m+1}`;
   const bg=document.createElement("div"); bg.className="pinbg";
-  bg.innerHTML=`<div class="pinbox"><h3>${who} PIN</h3><p>${side<0?"Enter your side's PIN to change set-up.":`Enter the ${who} PIN to enter ${who} scores. You only need to do this once on this phone.`}</p>
+  bg.innerHTML=`<div class="pinbox"><h3>${who} PIN</h3><p>${side<0?"Enter your match PIN to change set-up.":`Enter the ${who} PIN to enter scores for ${who}. You only need to do this once on this phone.`}</p>
     <input type="password" inputmode="numeric" autocomplete="off" maxlength="8"><div class="pe"></div><div class="pb"><button class="cx">Cancel</button><button class="ok">OK</button></div></div>`;
   document.body.appendChild(bg);
   const inp=bg.querySelector("input"), err=bg.querySelector(".pe"), close=()=>bg.remove();
@@ -1119,8 +1119,8 @@ function askPin(side, m, done){
       const r=await sb.rpc("golf_check_pin",{p_pin:v});
       if (r.error) throw r.error;
       const sd=r.data;
-      if (sd==null || (side>=0 && sd!==side*2+m)){ err.textContent="Wrong PIN"; inp.value=""; return; }
-      setPin(sd>>1, sd&1, v); close(); done && done();
+      if (sd==null || (side>=0 && sd!==m)){ err.textContent="Wrong PIN"; inp.value=""; return; }
+      setPin(0, sd, v); close(); done && done();
     }catch(e){ err.textContent="No connection – try again"; }
   };
   bg.querySelector(".ok").onclick=go;
@@ -1205,7 +1205,7 @@ async function liveWrite(mi, side, player, hole, v){
 }
 async function liveClear(hole){
   if (!sbInit()) return;
-  try{ for (const sd of [0,1,2,3]){ const pin=getPin(sd>>1, sd&1); if (!pin) continue; const r=await sb.rpc("golf_clear",{p_pin:pin, p_course:RC_KEY, p_hole:hole}); if (r.error) throw r.error; } }catch(e){ liveState="error"; renderRC(); }
+  try{ for (const sd of [0,1]){ const pin=getPin(0, sd); if (!pin) continue; const r=await sb.rpc("golf_clear",{p_pin:pin, p_course:RC_KEY, p_hole:hole}); if (r.error) throw r.error; } }catch(e){ liveState="error"; renderRC(); }
 }
 let setTimer=null;
 function pushSettings(){ if (!sbInit()) return Promise.resolve(); clearTimeout(setTimer);
