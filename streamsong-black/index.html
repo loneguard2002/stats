@@ -14,7 +14,9 @@
   header{background:var(--navy);color:#fff;padding:12px 16px 12px}
   .kicker{font-size:11px;letter-spacing:.08em;font-weight:600;color:#9fe0bd;text-transform:uppercase}
   .titlerow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2px}
-  h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:40px;line-height:1;margin:0}
+  h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:clamp(30px,9.5vw,40px);line-height:1;margin:0;white-space:nowrap}
+  .titlerow .par{white-space:nowrap}
+  .titlerow .par small{white-space:nowrap}
   .par{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:24px;font-weight:700;text-align:right;line-height:1}
   .par small{display:block;font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:500;color:#9db0c3;margin-top:4px}
   .stick{position:sticky;top:0;z-index:6;background:#fff;box-shadow:0 2px 6px rgba(11,27,43,.08)}
@@ -147,7 +149,7 @@
   .day.today .pill{background:var(--safe);color:#fff}
   .day .res{margin-top:8px;font-size:12.5px;font-weight:600}
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
-  .hdrlink{margin-left:auto;flex:none;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
+  .hdrlink{align-self:center;margin:4px 6px 0;flex:none;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
   .homebtn{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;cursor:pointer;margin-right:8px;letter-spacing:.02em}
   #print{display:none}
   @media print{
@@ -179,9 +181,10 @@
 </div>
 <div id="screen" class="wrap">
   <header>
-    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span><a class="hdrlink" id="h-card" href="#" target="_blank" rel="noopener">📋 Scorecard</a></div>
+    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span></div>
     <div class="titlerow">
       <h1 id="h-title">HOLE 01</h1>
+      <a class="hdrlink" id="h-card" href="#" target="_blank" rel="noopener">📋 Scorecard</a>
       <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
     </div>
   </header>
@@ -609,7 +612,7 @@ const COURSES = {
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
     foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
     holes:BONE_HOLES,
-    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38], 2:[39,72], 3:[72,93], 4:[93,135], 5:[135,170], 6:[170,194], 7:[194,211], 8:[211,243], 9:[243,280] }, files:{ 1:"clips/bone-01", 2:"clips/bone-02", 3:"clips/bone-03", 4:"clips/bone-04", 5:"clips/bone-05", 6:"clips/bone-06", 7:"clips/bone-07", 8:"clips/bone-08", 9:"clips/bone-09" } } },
+    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38], 2:[39,72], 3:[72,93], 4:[93,135], 5:[135,170], 6:[170,194], 7:[194,211], 8:[211,243], 9:[243,280], 10:[280,309], 11:[309,336], 12:[336,350], 13:[350,379], 14:[379,412], 15:[412,439], 16:[439,454], 17:[454,482], 18:[482,523] }, files:{ 1:"clips/bone-01", 2:"clips/bone-02", 3:"clips/bone-03", 4:"clips/bone-04", 5:"clips/bone-05", 6:"clips/bone-06", 7:"clips/bone-07", 8:"clips/bone-08", 9:"clips/bone-09", 10:"clips/bone-10", 11:"clips/bone-11", 12:"clips/bone-12", 13:"clips/bone-13", 14:"clips/bone-14", 15:"clips/bone-15", 16:"clips/bone-16", 17:"clips/bone-17", 18:"clips/bone-18" } } },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
     scorecard:"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
