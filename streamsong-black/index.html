@@ -185,6 +185,10 @@
   .board th{background:#f4f7fa;color:var(--muted);font-weight:600}
   .board td.nm,.board th.nm{width:62px;text-align:left;padding-left:4px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
   .board td.w0{background:#dbe7ff;color:#1d4ed8;font-weight:700}.board td.w1{background:#fde0e0;color:#c62828;font-weight:700}
+  .board .sc{display:inline-block;min-width:17px;line-height:15px;padding:1px 0}
+  .board .sc.e{border:1.5px double currentColor;border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 3px currentColor}.board .sc.b{border:1.5px solid currentColor;border-radius:50%}
+  .board .sc.o{border:1.5px solid currentColor}.board .sc.d{border:1.5px solid currentColor;box-shadow:0 0 0 2px #fff,0 0 0 3px currentColor}
+  .board table.stats td{padding:5px 0}.board table.stats td.nm{width:auto}
   .board td.t{font-weight:700;background:#f4f7fa}
   .pinbox .ok{background:var(--navy);color:#fff}.pinbox .cx{background:#eef3f8;color:var(--navy)}
   .lv{display:block;width:fit-content;margin-top:3px;font:600 10px Inter,Arial,sans-serif;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.12);color:#cbd5e1;letter-spacing:.02em;text-transform:none;vertical-align:2px}
@@ -1273,13 +1277,20 @@ function boardHTML(){
     const tbl=(a,b,lab,tot)=>{ let t=`<table><tr><th class="nm">Hole</th>`; for(let n=a;n<=b;n++) t+=`<th>${n}</th>`; t+=`<th>${lab}</th>${tot?"<th>Tot</th>":""}</tr><tr><th class="nm">Par</th>`;
       let pp=0; for(let n=a;n<=b;n++){ pp+=HOLES[n-1].par; t+=`<th>${HOLES[n-1].par}</th>`; } const pAll=HOLES.reduce((x,H)=>x+H.par,0); t+=`<th>${pp}</th>${tot?`<th>${pAll}</th>`:""}</tr>`;
       [0,1].forEach(side=>{ t+=`<tr><td class="nm ${TEAM_CLS[side]}">${teamName(m,mi,side)}</td>`; let s=0,k=0,sa=0,ka=0;
-        for(let n=a;n<=b;n++){ const v=val(n,side), r=S.res[n]; if(v!=null){s+=v;k++;} t+=`<td class="${r&&r.done&&r.winner===side?"w"+side:""}">${v==null?"":v}</td>`; }
+        for(let n=a;n<=b;n++){ const v=val(n,side), r=S.res[n]; if(v!=null){s+=v;k++;} const dd=v==null?null:v-HOLES[n-1].par, mk=dd==null?"":dd<=-2?"e":dd===-1?"b":dd===1?"o":dd>=2?"d":"";
+          t+=`<td class="${r&&r.done&&r.winner===side?"w"+side:""}">${v==null?"":`<span class="sc ${mk}">${v}</span>`}</td>`; }
         for(let n=1;n<=18;n++){ const v=val(n,side); if(v!=null){sa+=v;ka++;} }
         t+=`<td class="t">${k?s:""}</td>${tot?`<td class="t">${ka?sa:""}</td>`:""}</tr>`; });
       return t+`</table>`; };
     h+=tbl(1,9,"Out",false)+tbl(10,18,"In",true);
+    const who = RC.single ? [0,1].map(sd=>[sd,0,teamName(m,mi,sd)]) : [0,1].flatMap(sd=>[0,1].map(p=>[sd,p,m.players[sd][p]]));
+    h+=`<table class="stats"><tr><th class="nm">Stats</th><th>Eagle</th><th>Birdie</th><th>Par</th><th>Bogey</th><th>Dbl+</th><th>vs par</th></tr>`;
+    who.forEach(([sd,p,nm])=>{ const c=[0,0,0,0,0]; let tp=0, any=false;
+      for(let n=1;n<=18;n++){ const v=((m.scores[n]||[[null,null],[null,null]])[sd]||[])[p]; if(v==null) continue; any=true; const d=v-HOLES[n-1].par; tp+=d; c[d<=-2?0:d===-1?1:d===0?2:d===1?3:4]++; }
+      h+=`<tr><td class="nm ${TEAM_CLS[sd]}">${nm}</td>${c.map(x=>`<td>${x||""}</td>`).join("")}<td class="t">${any?(tp>0?"+"+tp:tp===0?"E":tp):""}</td></tr>`; });
+    h+=`</table>`;
   });
-  return h+`<div style="font-size:11.5px;color:var(--muted);margin-top:6px">Gross scores. Shaded = hole won${RC.net?" (after strokes)":""}.</div>`;
+  return h+`<div style="font-size:11.5px;color:var(--muted);margin-top:6px">Gross scores. ◯ birdie, ◎ eagle, ▢ bogey, double box = double bogey or worse. Shaded = hole won${RC.net?" (after strokes)":""}.</div>`;
 }
 function showBoard(){ let bg=document.getElementById("boardbg"); if (!bg){ bg=document.createElement("div"); bg.id="boardbg"; bg.className="pinbg";
     bg.addEventListener("click",e=>{ if (e.target===bg || e.target.closest("[data-bx]")) bg.remove(); }); document.body.appendChild(bg); }
