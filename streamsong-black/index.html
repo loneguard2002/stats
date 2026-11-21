@@ -586,7 +586,7 @@ const COURSES = {
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
     foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
     holes:BONE_HOLES,
-    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] }, chop:{ 1:"rIaPjLVgxDXxf_gNbIoDL" } } },
+    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] }, chop:{ 1:"rIaPjLVgxDXxf_gNbIoDL" }, files:{ 1:"clips/bone-01" } } },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
     foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
@@ -1127,8 +1127,17 @@ function renderVideo(C,h){
   const el=document.getElementById("vid"); const v=C.video, seg=v&&v.seg[h.n];
   const key=`${C.key}-${h.n}-${vidOpen}`; if (el.dataset.key===key) return; el.dataset.key=key;
   const chop=v&&v.chop&&v.chop[h.n];
+  const file=v&&v.files&&!v.filesMissing&&v.files[h.n];
   if (!seg && !chop){ el.innerHTML=""; return; }
   const yt=seg?`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`:`https://www.youtube.com/watch?v=${v.id}`;
+  if (file){
+    el.innerHTML=`<div class="lbl" style="margin:10px 12px 4px">Hole ${h.n} video overview</div>
+      <div class="vbox" id="vbox"><button class="vclose" data-vid="exitfs">✕ Close</button><div class="ar" style="padding-top:56.25%"><video id="hv" src="${file}.mp4" poster="${file}.jpg" controls playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;background:#000"></video></div></div>
+      <div class="vlinks"><button data-vid="fs">⛶ Full screen</button><span style="color:var(--muted)">${seg?`Clip ${fmtT(seg[0])}–${fmtT(seg[1])}`:""}</span><a href="${yt}" target="_blank" rel="noopener">Open in YouTube</a></div>`;
+    const hv=document.getElementById("hv");
+    hv.addEventListener("error", ()=>{ v.filesMissing=true; el.dataset.key=""; renderVideo(C,h); }, {once:true});
+    return;
+  }
   if (chop){
     el.innerHTML=`<div class="lbl" style="margin:10px 12px 4px">Hole ${h.n} video overview</div>
       <div class="vbox" id="vbox"><button class="vclose" data-vid="exitfs">✕ Close</button><div class="ar"><iframe src="https://tubechop.com/videos/${chop}/embed" title="${C.full} - Hole ${h.n}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe></div></div>
@@ -1146,6 +1155,9 @@ document.getElementById("vid").addEventListener("click", e=>{
   const b=e.target.closest("[data-vid]"); if (!b) return;
   e.stopPropagation();
   if (b.dataset.vid==="fs"){ const vb=document.getElementById("vbox"); if (!vb) return;
+    const hv=document.getElementById("hv");
+    if (hv){ const vr=hv.requestFullscreen||hv.webkitRequestFullscreen||hv.webkitEnterFullscreen;
+      if (vr){ try{ const p=vr.call(hv); if (p&&p.catch) p.catch(()=>{}); hv.play&&hv.play().catch(()=>{}); return; }catch(err){} } }
     const req=vb.requestFullscreen||vb.webkitRequestFullscreen;
     vb.classList.add("vfs"); document.body.style.overflow="hidden";
     if (req){ try{ const p=req.call(vb); if (p&&p.catch) p.catch(()=>{}); }catch(err){} }
