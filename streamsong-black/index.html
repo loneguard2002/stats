@@ -1048,6 +1048,7 @@ function matchStatus(match){
   return {text, pts, final: !!closed || thru===18, res, diff};
 }
 const ACT=()=>RC.m.slice(0, RC.count||1);
+const teamName=(m,mi,side)=>{ const n=(m.players[side]||[])[0]; return (!n || /^(EU|US) \d$/.test(n)) ? `${RC.teams[side]} ${mi+1}` : n; };
 const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""); };
 
 
@@ -1144,7 +1145,7 @@ function renderRCfull(){
         (RC.single?[0]:[0,1]).forEach(p=>{
           const v=sc[side][p], k=strokesFor(m,side,p,hole);
           const isBest = r && r.done && v!=null && (v-k)===r.best[side];
-          h+=`<div class="pl ${isBest?'best':''}"><span class="nm">${RC.single?RC.teams[side]+" team score":m.players[side][p]}${k?`<i>${"●".repeat(k)}</i>`:""}</span><span class="stp"><button data-act="dec" data-m="${mi}" data-s="${side}" data-p="${p}" aria-label="minus">−</button><span class="v">${v==null?"–":v}</span><button data-act="inc" data-m="${mi}" data-s="${side}" data-p="${p}" aria-label="plus">+</button></span></div>`;
+          h+=`<div class="pl ${isBest?'best':''}"><span class="nm">${RC.single?teamName(m,mi,side):m.players[side][p]}${k?`<i>${"●".repeat(k)}</i>`:""}</span><span class="stp"><button data-act="dec" data-m="${mi}" data-s="${side}" data-p="${p}" aria-label="minus">−</button><span class="v">${v==null?"–":v}</span><button data-act="inc" data-m="${mi}" data-s="${side}" data-p="${p}" aria-label="plus">+</button></span></div>`;
         });
         h+=`</div>`;
       });
@@ -1161,8 +1162,8 @@ function renderRCfull(){
         <div class="seg" style="margin:6px 0"><button data-act="single" data-v="1" aria-pressed="${!!RC.single}">One score per team</button><button data-act="single" data-v="0" aria-pressed="${!RC.single}">Each player's score</button></div>
         <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0"><input type="checkbox" data-f="net" ${RC.net?"checked":""}> Net scoring – strokes off the lowest handicap in each match</label>`;
       ACT().forEach((m,mi)=>{
-        if ((RC.count||1)>1) h+=`<div style="font-weight:700;font-size:12.5px;margin-top:8px">Match ${mi+1}</div>`;
-        if (RC.single){ h+=`<div class="lab">Team handicaps (optional – strokes given off the lower)</div><div class="row">`; [0,1].forEach(side=>{ h+=`<div style="font-size:12.5px;font-weight:600;align-self:center;color:${side?'#c62828':'#1d4ed8'}">${RC.teams[side]}</div><input type="number" inputmode="numeric" data-f="hcp" data-m="${mi}" data-s="${side}" data-p="0" value="${m.hcp[side][0]}">`; }); h+=`</div>`; return; }
+        if ((RC.count||1)>1 && !RC.single) h+=`<div style="font-weight:700;font-size:12.5px;margin-top:8px">Match ${mi+1}</div>`;
+        if (RC.single){ h+=`<div style="font-weight:700;font-size:12.5px;margin-top:8px">Match ${mi+1} – team name / handicap</div><div class="row">`; [0,1].forEach(side=>{ h+=`<input type="text" data-f="name" data-m="${mi}" data-s="${side}" data-p="0" value="${teamName(m,mi,side)}" style="border-color:${side?'#f3b4b4':'#b9cdf7'}"><input type="number" inputmode="numeric" data-f="hcp" data-m="${mi}" data-s="${side}" data-p="0" value="${m.hcp[side][0]}">`; }); h+=`</div>`; return; }
         [0,1].forEach(side=>{
           h+=`<div class="lab ${TEAM_CLS[side]}">${RC.teams[side]} – name / handicap</div><div class="row">`;
           [0,1].forEach(p=>{ h+=`<input type="text" data-f="name" data-m="${mi}" data-s="${side}" data-p="${p}" value="${m.players[side][p]}"><input type="number" inputmode="numeric" data-f="hcp" data-m="${mi}" data-s="${side}" data-p="${p}" value="${m.hcp[side][p]}">`; });
