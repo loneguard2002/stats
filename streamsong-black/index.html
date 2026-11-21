@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Streamsong – Team Europe Course Guide</title>
+<title>Wider Cup – Streamsong 2026</title>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Wider Cup">
+<meta name="theme-color" content="#0b1b2b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -14,7 +19,8 @@
   header{background:var(--navy);color:#fff;padding:12px 16px 12px}
   .kicker{font-size:11px;letter-spacing:.08em;font-weight:600;color:#9fe0bd;text-transform:uppercase}
   .titlerow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2px}
-  h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:clamp(30px,9.5vw,40px);line-height:1;margin:0;white-space:nowrap}
+  h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:clamp(28px,8.6vw,40px);line-height:1;margin:0}
+  .titlerow h1{white-space:nowrap}
   .titlerow .par{white-space:nowrap}
   .titlerow .par small{white-space:nowrap}
   .par{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:24px;font-weight:700;text-align:right;line-height:1}
@@ -137,6 +143,13 @@
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;z-index:20;display:none}
   #home{display:none}
   .home-hero{background:var(--navy);color:#fff;padding:22px 18px 20px}
+  .herobadge{display:block;width:120px;height:120px;margin:2px auto 12px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+  .home-hero{text-align:center}
+  .hbadge{flex:none;width:clamp(34px,10vw,44px);height:clamp(34px,10vw,44px);margin-right:7px;align-self:center}
+  .titlerow{justify-content:flex-start}
+  .titlerow h1{margin-right:auto}
+  .titlerow .hdrlink{margin-right:auto}
+  @media (max-width:390px){ .hdrlink{padding:4px 7px;font-size:10.5px;margin:4px 4px 0} .par{font-size:21px} .par small{font-size:10px} header{padding-left:12px;padding-right:12px} }
   .home-hero h1{font-size:42px;margin:4px 0 6px}
   .home-hero p{margin:0;color:#b9c8d6;font-size:13.5px;line-height:1.4}
   .days{padding:12px 12px 4px}
@@ -149,7 +162,7 @@
   .day.today .pill{background:var(--safe);color:#fff}
   .day .res{margin-top:8px;font-size:12.5px;font-weight:600}
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
-  .hdrlink{align-self:center;margin:4px 6px 0;flex:none;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
+  .hdrlink{align-self:center;margin:4px 6px 0;flex:none;white-space:nowrap;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
   .homebtn{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;cursor:pointer;margin-right:8px;letter-spacing:.02em}
   #print{display:none}
   @media print{
@@ -175,14 +188,15 @@
 </head>
 <body>
 <div id="home" class="wrap">
-  <div class="home-hero"><div class="kicker">Team Europe · Streamsong Resort</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
+  <div class="home-hero"><img class="herobadge" src="img/wider-cup-256.png" alt="Wider Cup badge"><div class="kicker">Wider Cup · Streamsong 2026</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
   <div class="days" id="days"></div>
-  <footer>Each day keeps its own scores on this phone. Course data: official and published scorecards; hole notes from the Team Europe field guide (Black) and published reviews (Bone Valley, Blue).</footer>
+  <footer>Each day keeps its own scores on this phone. Course data: official and published scorecards; hole notes from the field guide (Black) and published reviews (Bone Valley, Blue).</footer>
 </div>
 <div id="screen" class="wrap">
   <header>
-    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span></div>
+    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Wider Cup / Streamsong Black</span></div>
     <div class="titlerow">
+      <img class="hbadge" src="img/wider-cup-256.png" alt="">
       <h1 id="h-title">HOLE 01</h1>
       <a class="hdrlink" id="h-card" href="#" target="_blank" rel="noopener">📋 Scorecard</a>
       <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
@@ -214,7 +228,7 @@
     <div><b id="lk-t">Open the real aerial</b><small id="lk-s">allgolfholes.com – hole shape and distance overlay</small></div><div class="go">›</div>
   </a>
   <footer><span id="c-foot"></span>
-    <span style="display:none">Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial. </span> Plans assume a 16–18 handicap with a comfortable 2nd-shot limit of 190 yd. Today's flags, wind and caddie advice take priority.
+    <span style="display:none">Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial. </span> Plans assume a 16–18 handicap with a comfortable 2nd-shot limit of 190 yd. Today's flags, wind and caddie advice take priority.
   </footer>
 </div>
 <div id="print"></div>
@@ -605,7 +619,7 @@ const COURSES = {
   black:{ key:"black", name:"Black", full:"Streamsong Black", day:1, date:"2026-11-20", label:"Fri 20 Nov", designer:"Gil Hanse", par:73, len:"6,747 yd from the Black tees",
     scorecard:"https://www.golfpass.com/travel-advisor/courses/37570-streamsong-resort-black-course/scorecard-and-layout",
     link:n=>AERIAL(n), linkTitle:"Open the real aerial", linkSub:"allgolfholes.com – hole shape and distance overlay",
-    foot:"Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial.",
+    foot:"Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial.",
     holes:BLACK_HOLES },
   bone:{ key:"bone", name:"Bone Valley", full:"Streamsong Bone Valley", day:2, date:"2026-11-21", label:"Sat 21 Nov", designer:"David McLay Kidd · opened 2026", par:72, len:"6,600 yd from the Black tees",
     scorecard:"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf",
@@ -1138,7 +1152,7 @@ function render(){
   const isHome = state.view==="home";
   document.getElementById("home").style.display = isHome?"block":"none";
   document.getElementById("screen").style.display = isHome?"none":"block";
-  if (isHome){ renderHome(); document.title="Streamsong – Team Europe Course Guide"; return; }
+  if (isHome){ renderHome(); document.title="Wider Cup – Streamsong 2026"; return; }
   setCourse(state.course);
   const C=COURSES[state.course];
   document.title=`${C.full} – Hole ${state.hole+1}`;
@@ -1246,7 +1260,7 @@ function buildPrint(tee="Black", drive=210){
   const C=COURSES[state.course]; setCourse(state.course);
   document.getElementById("print").innerHTML = HOLES.map(h=>`
     <section class="ppage">
-      <header><div class="kicker">Team Europe / ${C.full} · Day ${C.day} · ${C.label}</div>
+      <header><div class="kicker">Wider Cup / ${C.full} · Day ${C.day} · ${C.label}</div>
         <div class="titlerow"><h1>HOLE ${String(h.n).padStart(2,"0")}</h1><div class="par">PAR ${h.par}<small>Stroke index ${h.si} · ${Object.entries(h.tees).map(([t,y])=>t+" "+y).join(" · ")}</small></div></div></header>
       <div class="sub">${tee} tee ${h.tees[tee]} yd · plan for a ${drive}-yd drive · ${h.traced?"map traced from the Par The Course layout":state.course==="black"?"schematic map from field-guide notes – check the aerial":"schematic map from published notes – check the yardage book"}</div>
       <div class="cols">
