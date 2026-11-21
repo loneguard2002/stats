@@ -1173,7 +1173,7 @@ function renderVideo(C,h){
   const yt=seg?`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`:`https://www.youtube.com/watch?v=${v.id}`;
   if (file){
     el.innerHTML=`<div class="lbl" style="margin:10px 12px 4px">Hole ${h.n} video overview</div>
-      <div class="vbox" id="vbox"><button class="vclose" data-vid="exitfs">✕ Close</button><div class="ar" style="padding-top:56.25%"><video id="hv" src="${file}.mp4?v=2" poster="${file}.jpg?v=2" controls playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;background:#000"></video></div></div>
+      <div class="vbox" id="vbox"><button class="vclose" data-vid="exitfs">✕ Close</button><div class="ar" style="padding-top:56.25%"><video id="hv" src="${file}.mp4?v=3" poster="${file}.jpg?v=3" controls playsinline preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;background:#000"></video></div></div>
       <div class="vlinks"><button data-vid="fs">⛶ Full screen</button><span style="color:var(--muted)">${seg?`Clip ${fmtT(seg[0])}–${fmtT(seg[1])}`:""}</span></div>`;
     return;
   }
