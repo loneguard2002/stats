@@ -49,6 +49,13 @@
   .step h3{margin:0 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#17784a}
   .step p{margin:0;font-size:14px;line-height:1.36}
   .yd{display:inline-block;margin-top:5px;font:600 12px Inter,Arial,sans-serif;background:#fff;border:1px solid #cfe9da;border-radius:6px;padding:3px 8px;color:#17784a}
+  .vbtn{display:flex;align-items:center;gap:10px;width:calc(100% - 20px);margin:10px 10px 2px;border:0;border-radius:10px;background:#c4302b;color:#fff;padding:11px 14px;font:700 14px Inter,Arial,sans-serif;cursor:pointer;text-align:left}
+  .vbtn small{display:block;font-weight:500;font-size:11.5px;opacity:.9;margin-top:1px}
+  .vbtn .pl{font-size:20px;line-height:1}
+  .vwrap{margin:10px 10px 2px;border-radius:10px;overflow:hidden;background:#000;position:relative;aspect-ratio:16/9}
+  .vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .vlinks{display:flex;justify-content:space-between;font-size:12px;padding:5px 12px 0}
+  .vlinks a,.vlinks button{color:var(--navy);font:600 12px Inter,Arial,sans-serif;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
   .ov{border-left:4px solid var(--navy);background:#eef3f8;border-radius:6px;padding:9px 11px;margin:7px 0}
   .ov h3{margin:0 0 3px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
   .ov p{margin:0;font-size:14px;line-height:1.4}
@@ -164,6 +171,7 @@
     <div class="lbl" style="margin-top:8px">Your typical drive (carry + roll)</div>
     <div class="seg" id="drives"></div>
   </div>
+  <div id="vid"></div>
   <div class="mapcard" id="mapwrap"></div>
   <div class="badge" id="badge"></div>
   <div class="legend"><span><i style="background:var(--safe)"></i>Recommended target</span><span><i style="background:var(--amber)"></i>Give this space</span></div>
@@ -568,7 +576,8 @@ const COURSES = {
   bone:{ key:"bone", name:"Bone Valley", full:"Streamsong Bone Valley", day:2, date:"2026-11-21", label:"Sat 21 Nov", designer:"David McLay Kidd · opened 2026", par:72, len:"6,600 yd from the Black tees",
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
     foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
-    holes:BONE_HOLES },
+    holes:BONE_HOLES,
+    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] } } },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
     foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
@@ -1100,9 +1109,28 @@ function render(){
   document.getElementById("tbl").innerHTML = tableFor(h, state.tee, state.drive);
   document.getElementById("drv-lbl").textContent = state.drive;
   document.getElementById("aerial").href = C.link(h.n);
+  renderVideo(C, h);
   const sel=document.querySelector('.holes button[aria-pressed=true]'); if (sel && sel.scrollIntoView) sel.scrollIntoView({block:"nearest", inline:"center"});
 }
-function go(i){ state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
+let vidOpen=false;
+const fmtT=t=>`${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
+function renderVideo(C,h){
+  const el=document.getElementById("vid"); const v=C.video, seg=v&&v.seg[h.n];
+  if (!seg){ el.innerHTML=""; return; }
+  const yt=`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`;
+  if (!vidOpen){
+    el.innerHTML=`<button class="vbtn" data-vid="open"><span class="pl">▶</span><span>Watch hole ${h.n} overview<small>Video clip ${fmtT(seg[0])}–${fmtT(seg[1])} · ${seg[1]-seg[0]} seconds</small></span></button>`;
+  } else {
+    el.innerHTML=`<div class="vwrap"><iframe src="https://www.youtube-nocookie.com/embed/${v.id}?start=${seg[0]}&end=${seg[1]}&autoplay=1&playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Hole ${h.n} overview video"></iframe></div>
+      <div class="vlinks"><a href="${yt}" target="_blank" rel="noopener">Open in YouTube (${fmtT(seg[0])})</a><button data-vid="close">Close video</button></div>`;
+  }
+}
+document.getElementById("vid").addEventListener("click", e=>{
+  const b=e.target.closest("[data-vid]"); if (!b) return;
+  e.stopPropagation(); vidOpen = b.dataset.vid==="open";
+  renderVideo(COURSES[state.course], HOLES[state.hole]);
+});
+function go(i){ vidOpen=false; state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
 function goHome(){ state.view="home"; try{ history.replaceState(null,"","#home"); }catch(e){ location.hash="home"; } render(); window.scrollTo(0,0); }
 document.addEventListener("click", e=>{
   const hb=e.target.closest("[data-home]"); if (hb){ goHome(); return; }
