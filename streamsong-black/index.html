@@ -165,6 +165,15 @@
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
   .hdrlink{align-self:center;margin:4px 6px 0;flex:none;white-space:nowrap;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
   .rfbtn{margin-left:auto;margin-right:0}
+  .pinbg{position:fixed;inset:0;background:rgba(11,27,43,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+  .pinbox{background:#fff;border-radius:14px;padding:18px 16px 14px;width:100%;max-width:300px;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center}
+  .pinbox h3{margin:0 0 4px;font:700 17px Inter,Arial,sans-serif;color:var(--navy)}
+  .pinbox p{margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+  .pinbox input{width:100%;font:700 24px Inter,Arial,sans-serif;letter-spacing:.5em;text-align:center;padding:10px;border:1.5px solid var(--line);border-radius:10px}
+  .pinbox .pe{color:#c62828;font-size:12px;min-height:16px;margin:6px 0 2px}
+  .pinbox .pb{display:flex;gap:8px;margin-top:6px}
+  .pinbox .pb button{flex:1;border:0;border-radius:10px;padding:10px;font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+  .pinbox .ok{background:var(--navy);color:#fff}.pinbox .cx{background:#eef3f8;color:var(--navy)}
   .lv{display:block;width:fit-content;margin-top:3px;font:600 10px Inter,Arial,sans-serif;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.12);color:#cbd5e1;letter-spacing:.02em;text-transform:none;vertical-align:2px}
   .lv.live{color:#86efac}.lv.connecting{color:#fde68a}.lv.error{color:#fca5a5}
   .homebtn{white-space:nowrap;flex:none}
@@ -1052,6 +1061,35 @@ const teamName=(m,mi,side)=>{ const n=(m.players[side]||[])[0]; return (!n || /^
 const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""); };
 
 
+
+// ---------------- Team PINs ----------------
+const getPin=side=>{ try{ return localStorage.getItem("ssb-pin-"+side); }catch(e){ return null; } };
+const setPin=(side,v)=>{ try{ v==null?localStorage.removeItem("ssb-pin-"+side):localStorage.setItem("ssb-pin-"+side,v); }catch(e){} };
+const anyPin=()=>getPin(0)||getPin(1);
+function askPin(side, done){
+  const who = side<0 ? "your team" : RC.teams[side];
+  const bg=document.createElement("div"); bg.className="pinbg";
+  bg.innerHTML=`<div class="pinbox"><h3>${who} PIN</h3><p>${side<0?"Enter your side's PIN to change set-up.":`Enter the ${who} PIN to enter ${who} scores. You only need to do this once on this phone.`}</p>
+    <input type="password" inputmode="numeric" autocomplete="off" maxlength="8"><div class="pe"></div><div class="pb"><button class="cx">Cancel</button><button class="ok">OK</button></div></div>`;
+  document.body.appendChild(bg);
+  const inp=bg.querySelector("input"), err=bg.querySelector(".pe"), close=()=>bg.remove();
+  setTimeout(()=>inp.focus(),50);
+  bg.querySelector(".cx").onclick=close;
+  const go=async ()=>{
+    const v=inp.value.trim(); if (!v) return; err.textContent="Checking…";
+    if (!sbInit()){ err.textContent="No connection – try again"; return; }
+    try{
+      const r=await sb.rpc("golf_check_pin",{p_pin:v});
+      if (r.error) throw r.error;
+      const sd=r.data;
+      if (sd==null || (side>=0 && sd!==side)){ err.textContent="Wrong PIN"; inp.value=""; return; }
+      setPin(sd, v); close(); done && done();
+    }catch(e){ err.textContent="No connection – try again"; }
+  };
+  bg.querySelector(".ok").onclick=go;
+  inp.addEventListener("keydown",e=>{ if (e.key==="Enter") go(); });
+}
+
 // ---------------- Shared live scoring (Supabase) ----------------
 const SUPA_URL="https://wwegxwnphtffdsmrgrpj.supabase.co", SUPA_KEY="sb_publishable_6DwDGJXoDulFBijqL7rbAA_fI0cZKZL";
 let sb=null, liveState="off", liveCh=null;
@@ -1073,7 +1111,7 @@ async function liveLoad(key){
     const mine=localRows(key).filter(r=>!seen.has(`${r.match}-${r.hole}-${r.side}-${r.player}`));   // scores entered offline on this phone
     if (st.data && st.data.data) applySettings(st.data.data); else await pushSettings();
     RC.m.forEach(m=>m.scores={}); server.forEach(r=>setScore(r, r.score)); mine.forEach(r=>setScore(r, r.score));
-    if (mine.length) await sb.from("golf_scores").upsert(mine);
+    for (const r of mine){ const pin=getPin(r.side); if (pin) await sb.rpc("golf_set_score",{p_pin:pin, p_course:key, p_match:r.match, p_hole:r.hole, p_side:r.side, p_player:r.player, p_score:r.score}); }
     liveState="live"; liveRefresh(); liveSubscribe(key);
   }catch(e){ liveState="error"; renderRC(); }
 }
@@ -1092,19 +1130,20 @@ function liveSubscribe(key){
 async function liveWrite(mi, side, player, hole, v){
   if (!sbInit()) return;
   try{
-    const r = v==null
-      ? await sb.from("golf_scores").delete().match({course:RC_KEY, match:mi, hole, side, player})
-      : await sb.from("golf_scores").upsert({course:RC_KEY, match:mi, hole, side, player, score:v, updated_at:new Date().toISOString()});
+    const r = await sb.rpc("golf_set_score",{p_pin:getPin(side), p_course:RC_KEY, p_match:mi, p_hole:hole, p_side:side, p_player:player, p_score:v});
     if (r.error) throw r.error; if (liveState!=="live"){ liveState="live"; renderRC(); }
-  }catch(e){ liveState="error"; renderRC(); toast("Not synced – saved on this phone"); }
+  }catch(e){
+    if (/PIN/i.test((e&&e.message)||"")){ setPin(side,null); toast("Wrong PIN – score not saved"); liveLoad(RC_KEY); return; }
+    liveState="error"; renderRC(); toast("Not synced – saved on this phone"); }
 }
 async function liveClear(hole){
   if (!sbInit()) return;
-  try{ let q=sb.from("golf_scores").delete().eq("course", RC_KEY); if (hole!=null) q=q.eq("hole", hole); const r=await q; if (r.error) throw r.error; }catch(e){ liveState="error"; renderRC(); }
+  try{ for (const sd of [0,1]){ const pin=getPin(sd); if (!pin) continue; const r=await sb.rpc("golf_clear",{p_pin:pin, p_course:RC_KEY, p_hole:hole}); if (r.error) throw r.error; } }catch(e){ liveState="error"; renderRC(); }
 }
 let setTimer=null;
 function pushSettings(){ if (!sbInit()) return Promise.resolve(); clearTimeout(setTimer);
-  return new Promise(res=>{ setTimer=setTimeout(async ()=>{ try{ await sb.from("golf_settings").upsert({course:RC_KEY, data:settingsData(), updated_at:new Date().toISOString()}); }catch(e){} res(); }, 400); }); }
+  const pin=anyPin(); if (!pin) return Promise.resolve();
+  return new Promise(res=>{ setTimer=setTimeout(async ()=>{ try{ await sb.rpc("golf_save_settings",{p_pin:pin, p_course:RC_KEY, p_data:settingsData()}); }catch(e){} res(); }, 400); }); }
 document.addEventListener("visibilitychange", ()=>{ if (document.visibilityState==="visible" && sb) liveLoad(RC_KEY); });
 
 function renderRCcompact(){
@@ -1196,6 +1235,10 @@ document.getElementById("rc").addEventListener("click", e=>{
   const b=e.target.closest("[data-act]"); if (!b) return;
   e.stopPropagation();
   const act=b.dataset.act, hole=state.hole+1;
+  if ((act==="inc"||act==="dec") && sbInit() && !getPin(+b.dataset.s)){
+    const sel=`#rc [data-act="${act}"][data-m="${b.dataset.m}"][data-s="${b.dataset.s}"][data-p="${b.dataset.p}"]`;
+    askPin(+b.dataset.s, ()=>{ const nb=document.querySelector(sel); if (nb) nb.click(); }); return; }
+  if (act==="setup" && !RC.setup && sbInit() && !anyPin()){ askPin(-1, ()=>{ const nb=document.querySelector('#rc [data-act="setup"]'); if (nb) nb.click(); }); return; }
   if (act==="toggle"){ if (RC.single && (RC.count||1)===1) RC.det=!RC.det; else RC.open=!RC.open; }
   else if (act==="setup"){ RC.setup=!RC.setup; }
   else if (act==="count"){ RC.count=+b.dataset.c; pushSettings(); }
