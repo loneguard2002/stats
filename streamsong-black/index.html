@@ -17,7 +17,18 @@
   h1{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:40px;line-height:1;margin:0}
   .par{font-family:'Barlow Condensed',Arial Narrow,Arial,sans-serif;font-size:24px;font-weight:700;text-align:right;line-height:1}
   .par small{display:block;font-family:Inter,Arial,sans-serif;font-size:11px;font-weight:500;color:#9db0c3;margin-top:4px}
-  .nav{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:5}
+  .stick{position:sticky;top:0;z-index:6;background:#fff;box-shadow:0 2px 6px rgba(11,27,43,.08)}
+  .stick .rc{margin:6px 8px 0}
+  .stick .rc-body{max-height:55vh;overflow:auto}
+  .nav{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--line);background:#fff}
+  .rq{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;padding:6px 8px}
+  .rq .tm{display:flex;align-items:center;gap:5px;border:1.5px solid var(--line);border-radius:9px;padding:3px 4px}
+  .rq .tm.win{border-color:#1f9d5c;background:#f0faf4}
+  .rq .tm .tag{flex:none;width:34px;padding:4px 0;font-size:10.5px}
+  .rq .tm .stp{margin-left:auto}
+  .rq .mid{font:700 11px Inter,Arial,sans-serif;text-align:center;color:var(--muted);min-width:44px;line-height:1.2}
+  .rq .mid b{display:block;font-size:12px;color:var(--ink)}
+  .rq .dots{font-size:9px;color:#1f9d5c}
   .nav .arrow{flex:none;width:36px;height:36px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:18px;font-weight:700;color:var(--navy);cursor:pointer}
   .holes{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;padding:2px}
   .holes::-webkit-scrollbar{display:none}
@@ -56,6 +67,11 @@
   .vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .vlinks{display:flex;justify-content:space-between;font-size:12px;padding:5px 12px 0}
   .vlinks a,.vlinks button{color:var(--navy);font:600 12px Inter,Arial,sans-serif;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+  .mapgrid{display:grid;grid-template-columns:1fr;align-items:start;gap:0}
+  .mapgrid.two{grid-template-columns:auto minmax(0,1fr);gap:8px;padding-right:10px}
+  .mapgrid.two .mapcard{padding:10px 0 2px 10px}
+  #ovside .ov{margin:10px 0 0}
+  #ovside .ov p{font-size:13px;line-height:1.38}
   .vbox{margin:0 10px;border-radius:10px;overflow:hidden;background:#000}
   .vbox .ar{position:relative;width:100%;padding-top:70.54%;overflow:hidden;background:#000}
   .vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
@@ -168,12 +184,14 @@
       <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
     </div>
   </header>
+  <div class="stick">
+  <div class="rc" id="rc"></div>
   <div class="nav">
     <button class="arrow" data-step="-1" aria-label="Previous hole">‹</button>
     <div class="holes" id="holes"></div>
     <button class="arrow" data-step="1" aria-label="Next hole">›</button>
   </div>
-  <div class="rc" id="rc"></div>
+  </div>
   <div class="controls">
     <div class="lbl">Tee</div>
     <div class="chips" id="tees"></div>
@@ -181,7 +199,7 @@
     <div class="seg" id="drives"></div>
   </div>
   <div id="vid"></div>
-  <div class="mapcard" id="mapwrap"></div>
+  <div class="mapgrid" id="mapgrid"><div class="mapcard" id="mapwrap"></div><div id="ovside"></div></div>
   <div class="badge" id="badge"></div>
   <div class="legend"><span><i style="background:var(--safe)"></i>Recommended target</span><span><i style="background:var(--amber)"></i>Give this space</span></div>
   <div class="plan" id="plan"></div>
@@ -873,7 +891,7 @@ function svgFor(h, tee, drive, pxW, pxH){
 }
 
 // ---------------- Cards ----------------
-function cardsFor(h, tee, drive){
+function cardsFor(h, tee, drive, withOv=true){
   const shots=plan(h,tee,drive);
   const pill=(i)=>{ const sh=shots[i]; return sh.kind==="approach" ? `Shot ${i+1}: ${sh.carry} yd to the middle` : `Shot ${i+1}: ~${sh.carry} yd → leaves ${sh.left}`; };
   const pills=[[],[],[]];
@@ -885,7 +903,7 @@ function cardsFor(h, tee, drive){
   });
   const titles = h.par===3 ? ["Tee shot","Club & line","On the green"] : ["Aim off the tee","Next shot","Into the green"];
   const text=[h.steps.tee,h.steps.next,h.steps.green];
-  let html = h.overview ? `<div class="ov"><h3>Hole overview · Par ${h.par} · ${h.tees.Black} yd from the Black</h3><p>${h.overview}</p></div>` : "";
+  let html = (withOv && h.overview) ? `<div class="ov"><h3>Hole overview · Par ${h.par} · ${h.tees.Black} yd from the Black</h3><p>${h.overview}</p></div>` : "";
   html += text.map((t,i)=>`<div class="step"><div class="num">${i+1}</div><div><h3>${titles[i]}</h3><p>${t}</p>${pills[i].map(p=>`<span class="yd">${p}</span> `).join("")}</div></div>`).join("");
   html += `<div class="avoid"><h3>Less favourable / give this space</h3><p>${h.avoid}</p></div>`;
   return html;
@@ -914,7 +932,7 @@ fromHash();
 // ---------------- Ryder Cup four-ball scoring ----------------
 const TEAM_CLS=["eu","us"];
 function defaultMatches(){
-  return { open:true, setup:false, net:true, count:1, single:true, teams:["Europe","USA"],
+  return { open:true, det:false, setup:false, net:true, count:1, single:true, teams:["Europe","USA"],
     m:[0,1].map(i=>({ players:[[`EU ${i*2+1}`,`EU ${i*2+2}`],[`US ${i*2+1}`,`US ${i*2+2}`]], hcp:[[18,18],[18,18]], scores:{} })) };
 }
 function loadRC(key){
@@ -971,7 +989,27 @@ function matchStatus(match){
 const ACT=()=>RC.m.slice(0, RC.count||1);
 const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""); };
 
-function renderRC(){
+function renderRCcompact(){
+  const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole], m=RC.m[0];
+  const st=matchStatus(m), r=st.res[hole], sc=m.scores[hole]||[[null,null],[null,null]];
+  const cls = st.diff>0?"eu":st.diff<0?"us":"";
+  let h=`<div class="rc-head" data-act="toggle" style="padding:7px 12px"><b>Best ball</b><span class="rc-score"><span class="${cls}" style="font-size:13px">${st.text}</span><span class="chev">${RC.det?"▲":"▼"}</span></span></div>`;
+  const team=side=>{ const v=sc[side][0], k=strokesFor(m,side,0,hole); const win=r&&r.done&&r.winner===side;
+    return `<div class="tm ${win?'win':''}"><div class="tag ${TEAM_CLS[side]}">${RC.teams[side].slice(0,3).toUpperCase()}</div>${k?`<span class="dots">${"●".repeat(k)}</span>`:""}<span class="stp"><button data-act="dec" data-m="0" data-s="${side}" data-p="0" aria-label="minus">−</button><span class="v">${v==null?"–":v}</span><button data-act="inc" data-m="0" data-s="${side}" data-p="0" aria-label="plus">+</button></span></div>`; };
+  const mid = !r||!r.done ? `<b>H${hole}</b>Par ${H.par}` : r.winner==null ? `<b>H${hole}</b>Halved` : `<b>H${hole}</b><span style="color:${r.winner?'#c62828':'#1d4ed8'}">${RC.teams[r.winner].slice(0,3).toUpperCase()} win</span>`;
+  h+=`<div class="rq">${team(0)}<div class="mid">${mid}</div>${team(1)}</div>`;
+  if (RC.det){
+    h+=`<div class="rc-body" style="padding-top:0">`;
+    const row=(a,b)=>{ let t="<tr>"; for(let n=a;n<=b;n++) t+=`<th>${n}</th>`; t+="</tr><tr>"; for(let n=a;n<=b;n++){ const x=st.res[n]; const c=!x||!x.done?"":x.winner===0?"E":x.winner===1?"U":"H"; t+=`<td class="${c} ${n===hole?'cur':''}" data-act="goto" data-h="${n}">${c==="E"?RC.teams[0][0]:c==="U"?RC.teams[1][0]:c==="H"?"½":"·"}</td>`; } return t+"</tr>"; };
+    h+=`<table class="grid">${row(1,9)}${row(10,18)}</table>`;
+    h+=`<div class="rc-tools"><button data-act="setup">${RC.setup?"Close set-up":"Teams & handicaps"}</button><button data-act="copy">Copy results</button><button data-act="csv">Download CSV</button></div>`;
+    h+=`</div>`;
+  }
+  el.innerHTML=h;
+  if (RC.det && RC.setup){ const save=RC.open; RC.open=true; const tmp=document.createElement("div"); const cur=el.innerHTML; renderRCfull(true); const setupHtml=(el.querySelector(".setup")||{}).outerHTML||""; el.innerHTML=cur; el.querySelector(".rc-body").insertAdjacentHTML("beforeend", setupHtml); RC.open=save; }
+}
+function renderRC(){ if (RC.single && (RC.count||1)===1) return renderRCcompact(); return renderRCfull(); }
+function renderRCfull(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole];
   const st=ACT().map(matchStatus);
   const tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
@@ -1039,7 +1077,7 @@ document.getElementById("rc").addEventListener("click", e=>{
   const b=e.target.closest("[data-act]"); if (!b) return;
   e.stopPropagation();
   const act=b.dataset.act, hole=state.hole+1;
-  if (act==="toggle"){ RC.open=!RC.open; }
+  if (act==="toggle"){ if (RC.single && (RC.count||1)===1) RC.det=!RC.det; else RC.open=!RC.open; }
   else if (act==="setup"){ RC.setup=!RC.setup; }
   else if (act==="count"){ RC.count=+b.dataset.c; }
   else if (act==="single"){ RC.single=b.dataset.v==="1"; }
@@ -1108,13 +1146,16 @@ function render(){
   document.getElementById("holes").innerHTML = HOLES.map((x,i)=>`<button data-hole="${i}" aria-pressed="${i===state.hole}" class="${x.traced?'traced':''}">${x.n}</button>`).join("");
   document.getElementById("tees").innerHTML = Object.entries(h.tees).map(([t,y])=>`<button class="chip" aria-pressed="${t===state.tee}" data-tee="${t}"><span class="dot" style="background:${TEE_COLOURS[t]}"></span>${t} <span class="y">${y}</span></button>`).join("");
   document.getElementById("drives").innerHTML = DRIVES.map(d=>`<button aria-pressed="${d===state.drive}" data-drive="${d}">${d}</button>`).join("");
-  const wrap=document.getElementById("mapwrap");
-  const pxW=Math.min(wrap.clientWidth-20, 440), pxH=Math.min(Math.max(window.innerHeight*0.5, 320), 470);
+  const wrap=document.getElementById("mapwrap"), grid=document.getElementById("mapgrid");
+  const hasOv=!!h.overview; grid.classList.toggle("two", hasOv);
+  document.getElementById("ovside").innerHTML = hasOv ? `<div class="ov"><h3>Hole overview</h3><p>${h.overview}</p></div>` : "";
+  const fullW=Math.min(grid.clientWidth||document.getElementById("screen").clientWidth||430, 480);
+  const pxW=hasOv ? Math.round(fullW*0.5) : Math.min(fullW-20, 440), pxH=Math.min(Math.max(window.innerHeight*0.5, 320), 470);
   wrap.innerHTML = svgFor(h, state.tee, state.drive, pxW, pxH);
   const b=document.getElementById("badge");
   b.className = "badge"+(h.traced?"":" schem");
   b.innerHTML = h.traced ? "<b>●</b> Traced from the Par The Course layout" : state.course==="black" ? "<b>●</b> Schematic from the field guide – check the aerial" : "<b>●</b> Schematic from published notes – check the yardage book";
-  document.getElementById("plan").innerHTML = cardsFor(h, state.tee, state.drive);
+  document.getElementById("plan").innerHTML = cardsFor(h, state.tee, state.drive, false);
   document.getElementById("tbl").innerHTML = tableFor(h, state.tee, state.drive);
   document.getElementById("drv-lbl").textContent = state.drive;
   document.getElementById("aerial").href = C.link(h.n);
