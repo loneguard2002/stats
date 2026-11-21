@@ -49,6 +49,9 @@
   .step h3{margin:0 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#17784a}
   .step p{margin:0;font-size:14px;line-height:1.36}
   .yd{display:inline-block;margin-top:5px;font:600 12px Inter,Arial,sans-serif;background:#fff;border:1px solid #cfe9da;border-radius:6px;padding:3px 8px;color:#17784a}
+  .ov{border-left:4px solid var(--navy);background:#eef3f8;border-radius:6px;padding:9px 11px;margin:7px 0}
+  .ov h3{margin:0 0 3px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
+  .ov p{margin:0;font-size:14px;line-height:1.4}
   .avoid{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:6px;padding:9px 11px;margin:7px 0 4px}
   .avoid h3{margin:0 0 2px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a8701a}
   .avoid p{margin:0;font-size:14px;line-height:1.36}
@@ -336,7 +339,7 @@ const BLACK_HOLES = [
 // ---------------- Bone Valley (David McLay Kidd, 2026) – official scorecard; notes from published reviews ----------------
 const BONE_HOLES = [
 { n:1, par:4, si:5, tees:{Green:410,Black:390,Silver:350,Gold:290},
-  steps:{tee:"Wide landing area – swing freely, but favour centre-right, away from the lake on the left.", next:"Shallow, wide green: club for just past the flag and a couple of yards right of it (the local caddie line).", green:"Long-right misses roll back down the slope – that is the safe side. Anything left brings the lake in."},
+  steps:{tee:"Wide landing area – favour centre-right, away from the lake on the left. No need for a monster drive: too far can leave a blind approach.", next:"Shallow, wide green: club for just past the flag and a couple of yards right of it (the local caddie line).", green:"Long-right misses roll back down the slope – that is the safe side. Anything left brings the lake in."},
   avoid:"The lake down the left; dunes and native grass on the right.",
   path:[[0,4],[200,0],[425,-4]], fw:[[30,290,50,0]], green:[22,12],
   bunkers:[[12,-18,8,10]],
@@ -396,14 +399,14 @@ const BONE_HOLES = [
   bunkers:[[220,22,10,24],[16,-18,9,12]],
   areas:[], aim:{tee:-3,layup:0,green:0} },
 { n:11, par:4, si:12, tees:{Green:380,Black:350,Silver:320,Gold:225},
-  steps:{tee:"Short par 4 – a strong drive is the key and leaves a short iron.", next:"The ball can spin back off the front edge, so take enough club for the middle.", green:"Middle of the green; don't spin it off the front."},
+  steps:{tee:"Short par 4 – a strong drive is the key and leaves a short iron.", next:"The ball can spin back off the front edge, so take enough club for the middle.", green:"One of the wildest greens on the course – middle of the green, leave it below the hole and lag carefully."},
   avoid:"The front edge (spin-back) and short-siding yourself.",
   path:[[0,0],[395,0]], fw:[[0,290,46,0]], green:[16,17],
   bunkers:[[18,-17,8,12],[14,18,8,12]],
   areas:[], aim:{tee:0,green:0} },
 { n:12, par:3, si:18, tees:{Green:150,Black:135,Silver:120,Gold:90},
-  steps:{tee:"Easiest hole on the card, but the green sits among dunes – wind can add a club.", next:"Small, deep pot bunkers guard the front: carry them to the middle.", green:"Centre of the green, two putts."},
-  avoid:"The pot bunkers in front of the green.",
+  steps:{tee:"Easiest hole on the card, but the green sits up among dunes – into the wind take one or two extra clubs.", next:"A row of small, deep bunkers guards the front; short means a possible double bogey, so carry them to the middle.", green:"Centre of the green, two putts."},
+  avoid:"The row of deep bunkers in front of the green – being short is the one real mistake.",
   path:[[0,0],[165,0]], fw:[], green:[14,14],
   bunkers:[[16,-9,5,5],[18,0,5,5,"Pot bunkers","R"],[16,9,5,5]],
   areas:[{t:"scrub",d1:-25,d2:40,l1:-48,l2:-24,label:"Dunes"},{t:"scrub",d1:-25,d2:40,l1:24,l2:48,label:""}], aim:{green:0} },
@@ -414,7 +417,7 @@ const BONE_HOLES = [
   bunkers:[[230,23,10,28],[200,-24,10,22],[20,16,9,14]],
   areas:[], aim:{tee:0,layup:0,green:0} },
 { n:14, par:5, si:14, tees:{Green:520,Black:470,Silver:440,Gold:390}, noLand:[[110,220]],
-  steps:{tee:"Short par 5. Keep the drive in the fairway, short of the big diagonal ridge.", next:"The green shows through a 30-yard cut in the ridge: go through the gap to wedge range, or stop short of the ridge.", green:"Small green – aim at the middle. A good birdie chance."},
+  steps:{tee:"Short par 5. Keep the drive in the fairway, short of the big diagonal ridge.", next:"The second has to split the two big dunes – the green shows through a 30-yard cut in the ridge. Go through the gap to wedge range, or stop short of the ridge.", green:"Small green – aim at the middle. A good birdie chance."},
   avoid:"The diagonal ridge of sand and long grass running from near-left to far-right.",
   path:[[0,0],[535,0]], fw:[[0,380,50,0]], green:[16,18],
   bunkers:[[14,-16,8,10]],
@@ -564,13 +567,57 @@ const COURSES = {
     holes:BLACK_HOLES },
   bone:{ key:"bone", name:"Bone Valley", full:"Streamsong Bone Valley", day:2, date:"2026-11-21", label:"Sat 21 Nov", designer:"David McLay Kidd · opened 2026", par:72, len:"6,600 yd from the Black tees",
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
-    foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong – aim away from flags and let the slopes feed the ball.",
+    foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
     holes:BONE_HOLES },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
     foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
     holes:BLUE_HOLES }
 };
+// ---------------- Hole overviews (paraphrased from published reviews) ----------------
+const BONE_OV = [
+"Opening par 4 that shares its starting area with the Black. There is plenty of room off the tee, but a very long drive can leave a blind approach. The shallow, wide green has the lake on its left – water is in play here and again on 18.",
+"Rated one of the best holes on the course: a gentle right-to-left dogleg squeezed between a dune ridge on the right and a reedy lake on the left. The slopes around the green feed balls in from the left side.",
+"A long par 3 (185 from the Black) with bunkers placed deliberately around the green. Anything short catches the front slope and rolls back off the putting surface.",
+"Long par 5 (540 from the Black). The drive threads a chute of grassy dunes, then the hole bursts open onto a sea of sand. It rewards three steady shots rather than one big one.",
+"Stroke index 1 and the boldest hole on the front nine: a huge sweep of sandy waste with a thin vein of water cutting diagonally across the landing area. Lay up short of the water and play it as a three-shotter.",
+"The front nine's drivable par 4 (315 from the Black). The fairway is wide, but a drive that finishes just short leaves a long bunker shot. The wind decides whether it is worth going for.",
+"A tough mid-length par 3 (165 from the Black) that reviewers single out as a card-wrecker. The middle of the green is the target.",
+"Long par 4 (440 from the Black, stroke index 3). Little has been published about this hole yet, so ask the caddie for the line and be happy to make it a three-shot hole.",
+"Par 5 with a 25-foot 'shark's tooth' dune in the middle of the fairway. Play either side of it, then lay up into an 80-yard-wide stretch of short grass. The green is guarded by bunkers, wetland and a mound, with a wooden bridge behind.",
+"Starts what reviewers call the strongest stretch on the course (10 to 12). A solid par 4 of 390 from the Black; there are no detailed published notes, so take the caddie's line.",
+"Short par 4 with one of the wildest greens on the property. A good drive leaves a short iron, but approaches can spin back off the front edge – take enough club and leave the ball below the hole.",
+"The easiest hole on the card – about 135 from the Black – reached by walking through a cut in the dunes. The green sits up among the dunes behind a row of small, deep bunkers: come up short and a double bogey is in play. Into the wind it can need two extra clubs.",
+"Long par 4 (445 from the Black, stroke index 2), after which the course turns 180 degrees for home. No detailed published notes – treat it as a three-shot hole.",
+"Short par 5 and the most talked-about hole: a huge man-made ridge of sand and long grass runs diagonally across the hole between two massive dunes, and the green shows through a 30-yard cut. The second shot has to split the dunes.",
+"The back nine's drivable par 4 (305 from the Black), set at a different angle from the 6th, so the wind rarely favours both on the same day. The recommended play is a 3-wood lay-up.",
+"Long, downhill par 3 to a small, tiered, corseted green set into the dunes, with lakes and grassy hills behind. Missing left is the common mistake.",
+"A breather par 4 between 16 and 18: tee off from among the reeds and drive uphill to a generous fairway. The approach passes through wetlands and Spanish moss.",
+"Closing par 5 to a low, wavy green tucked between side slopes and the lake. A drive that catches the fairway downslope can make it reachable; a second that drifts left finishes up the slope."
+];
+const BLUE_OV = [
+"The opener plays from the highest tee on the property, with views over all of Streamsong, so it plays shorter than its 330 yards. Big fairway bunkers sit on both sides, a lone bunker left of the green and a large dune right, with run-off all around the green.",
+"Wide par 5 where a large, deep bunker cuts into the green and splits it into two sections. Choose the side of the fairway that matches the pin for the right angle in.",
+"A lake runs diagonally down the left: the more you take on, the shorter the approach. The green sits on a plateau with steep run-offs at the front and right, and a bunker and the lake on the left.",
+"Often called the best hole at Streamsong. It climbs a ridge to a green that slopes hard from back to front, guarded by deep bunkers front-left and front-right. Deep grass waits on the right.",
+"Short par 3 to a raised green that is 74 yards deep. The back half funnels right into a bowl and the front half to the middle, so the club changes a lot with the pin and the wind.",
+"Short par 4 dotted with fairway bunkers, leading to a green in a valley with run-off on every side and a big dune behind. Drivable only downwind.",
+"The signature hole of the resort: a par 3 over the lake to a green tucked under huge dunes. The green slopes hard right to left, so a shot right of the green can feed back toward the hole.",
+"Downhill par 4 (stroke index 2) with bunkers on the centreline. Left is shorter; right gives the better angle into an elevated, multi-tiered green with a big false front, greenside bunkers and a small pond.",
+"Par 5 with a blind tee shot over a big fairway bunker and trees down the left. The lay-up is benign, but the uphill, shallow green slopes hard from back to front with deep bunkers in front.",
+"Mid-length par 3. The large front bunker rarely comes into play; the green sits diagonally between bunkers and the front-right slopes away.",
+"Stroke index 1. A wide, flat landing area with a small pot bunker in mid-fairway and bunkers down the left. The only bunkerless green on the course – long, narrow and twisting, defended by rolls rather than sand.",
+"Thread the drive between fairway bunkers on both sides. Water and sand guard the approach, and the green is the most undulating on the course, with a severe back section.",
+"The shortest par 4 (293 from the Black). Drivable, but the green is narrow and flat with very deep bunkers on the left – an iron down the right is the percentage play.",
+"Par 5 with a carry over a lake from the back tees. The lay-up area has a small pot bunker right and a massive bunker left, and the small green has run-off on all sides.",
+"A dune and bunkers in mid-fairway hide the green on the second shot, and a blowout bunker sits on the left of the drive. The green slopes strongly left to right, with a punchbowl front flanked by deep bunkers.",
+"Long par 3 that is hard to see from the tee. Treacherous bunkers lie right; shots missing left kick back toward the middle. The back-left of the green is a plateau of its own.",
+"Monster par 5 (590 from the Black). The 'Great Hazard' bunkering crosses the fairway – carry it off the tee – then there is plenty of room. The approach is uphill and partly blind to a green with a false front.",
+"Long uphill par 4 to finish. Bunkers line the right side; once over the crest of the fairway the green appears. It slopes hard left to right and is hard to hold from the left side."
+];
+BONE_HOLES.forEach((h,i)=>h.overview=BONE_OV[i]);
+BLUE_HOLES.forEach((h,i)=>h.overview=BLUE_OV[i]);
+
 const COURSE_ORDER=["black","bone","blue"];
 let HOLES = BLACK_HOLES;
 
@@ -820,7 +867,8 @@ function cardsFor(h, tee, drive){
   });
   const titles = h.par===3 ? ["Tee shot","Club & line","On the green"] : ["Aim off the tee","Next shot","Into the green"];
   const text=[h.steps.tee,h.steps.next,h.steps.green];
-  let html = text.map((t,i)=>`<div class="step"><div class="num">${i+1}</div><div><h3>${titles[i]}</h3><p>${t}</p>${pills[i].map(p=>`<span class="yd">${p}</span> `).join("")}</div></div>`).join("");
+  let html = h.overview ? `<div class="ov"><h3>Hole overview · Par ${h.par} · ${h.tees.Black} yd from the Black</h3><p>${h.overview}</p></div>` : "";
+  html += text.map((t,i)=>`<div class="step"><div class="num">${i+1}</div><div><h3>${titles[i]}</h3><p>${t}</p>${pills[i].map(p=>`<span class="yd">${p}</span> `).join("")}</div></div>`).join("");
   html += `<div class="avoid"><h3>Less favourable / give this space</h3><p>${h.avoid}</p></div>`;
   return html;
 }
