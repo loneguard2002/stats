@@ -147,6 +147,7 @@
   .day.today .pill{background:var(--safe);color:#fff}
   .day .res{margin-top:8px;font-size:12.5px;font-weight:600}
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
+  .hdrlink{margin-left:auto;flex:none;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
   .homebtn{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;cursor:pointer;margin-right:8px;letter-spacing:.02em}
   #print{display:none}
   @media print{
@@ -178,7 +179,7 @@
 </div>
 <div id="screen" class="wrap">
   <header>
-    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span></div>
+    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Team Europe / Streamsong Black</span><a class="hdrlink" id="h-card" href="#" target="_blank" rel="noopener">📋 Scorecard</a></div>
     <div class="titlerow">
       <h1 id="h-title">HOLE 01</h1>
       <div class="par"><span id="h-par"></span><small id="h-si"></small></div>
@@ -599,15 +600,18 @@ const BLUE_HOLES = [
 
 const COURSES = {
   black:{ key:"black", name:"Black", full:"Streamsong Black", day:1, date:"2026-11-20", label:"Fri 20 Nov", designer:"Gil Hanse", par:73, len:"6,747 yd from the Black tees",
+    scorecard:"https://www.golfpass.com/travel-advisor/courses/37570-streamsong-resort-black-course/scorecard-and-layout",
     link:n=>AERIAL(n), linkTitle:"Open the real aerial", linkSub:"allgolfholes.com – hole shape and distance overlay",
     foot:"Hole 1 is traced from the Par The Course layout. Holes 2–18 are schematic maps drawn from the Team Europe field-guide notes: tee-to-green distances follow the scorecard, but hazard shapes and positions are indicative, so check the aerial.",
     holes:BLACK_HOLES },
   bone:{ key:"bone", name:"Bone Valley", full:"Streamsong Bone Valley", day:2, date:"2026-11-21", label:"Sat 21 Nov", designer:"David McLay Kidd · opened 2026", par:72, len:"6,600 yd from the Black tees",
+    scorecard:"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf",
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
     foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
     holes:BONE_HOLES,
-    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] }, files:{ 1:"clips/bone-01" } } },
+    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38], 2:[39,72], 3:[72,93] }, files:{ 1:"clips/bone-01", 2:"clips/bone-02", 3:"clips/bone-03" } } },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
+    scorecard:"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
     foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
     holes:BLUE_HOLES }
@@ -1136,6 +1140,7 @@ function render(){
   const C=COURSES[state.course];
   document.title=`${C.full} – Hole ${state.hole+1}`;
   document.getElementById("h-kicker").textContent = `Day ${C.day} · ${C.full}`;
+  document.getElementById("h-card").href = C.scorecard;
   document.getElementById("lk-t").textContent = C.linkTitle;
   document.getElementById("lk-s").textContent = C.linkSub;
   document.getElementById("c-foot").textContent = C.foot;
