@@ -712,6 +712,41 @@ Object.assign(BONE_HOLES[0],{
     ],
     aim:{tee:10,green:3}
   });
+// Bone Valley holes 2 and 3: shaped from the course video
+Object.assign(BONE_HOLES[1],{
+    steps:{tee:"Carry the waste and dune ridges off the tee and drive left-centre – a scrub ridge runs down the left, reeds and then the lake down the right.", next:"Approach to the LEFT half of the green. The lake wraps the right side and back, so if it is a long way, lay up short-left to a full wedge.", green:"Centre of the green is a good result; do not short-side yourself on the lake side."},
+    avoid:"The reeds and lake down the right and behind the green; the waste bunker short-left of the green.",
+    path:[[0,14],[130,6],[280,0],[430,0]],
+    fw:[],
+    fwPoly:[[18,2],[50,-12],[100,-24],[150,-34],[200,-38],[250,-34],[284,-26],[294,-8],[292,12],[280,30],[240,38],[190,42],[140,40],[90,36],[40,30],[14,22]],
+    roughPoly:[[428,-8],[385,-24],[335,-38],[280,-48],[225,-52],[170,-48],[134,-38],[122,-10],[124,18],[136,42],[190,50],[245,54],[300,52],[350,48],[400,40],[432,30]],
+    green:[24,20],
+    bunkers:[[14,-20,14,8,"Sand","L"],[12,17,8,6,"Pot","R"]],
+    areas:[
+      {t:"waste", label:"Waste area", poly:[[406,-38],[360,-46],[312,-38],[302,-6],[308,30],[350,40],[400,34],[412,0]]},
+      {t:"scrub", label:"Dune ridges", poly:[[372,-30],[338,-24],[330,-8],[358,-10]]},
+      {t:"scrub", label:"", poly:[[360,10],[322,16],[318,30],[350,28]]},
+      {t:"scrub", label:"Scrub ridge", poly:[[280,-52],[180,-58],[90,-46],[34,-32],[26,-50],[90,-66],[180,-76],[280,-70]]},
+      {t:"scrub", label:"Reeds", poly:[[260,54],[170,56],[80,52],[22,40],[-10,32],[-18,44],[20,56],[75,64],[168,68],[258,68]]},
+      {t:"water", label:"Lake", poly:[[250,72],[160,70],[70,66],[15,58],[-20,46],[-40,34],[-68,30],[-70,92],[250,92]]}
+    ],
+    aim:{tee:-4,layup:-2,green:-4}
+  });
+Object.assign(BONE_HOLES[2],{
+    avoid:"The scrub all down the right, the short bunker left of centre, and the bunkers left and right of the green.",
+    path:[[0,0],[200,0]],
+    fw:[],
+    fwPoly:[[12,-6],[24,-24],[50,-30],[82,-26],[110,-20],[116,0],[110,20],[80,28],[48,30],[22,24]],
+    roughPoly:[[196,-10],[180,-34],[150,-40],[110,-36],[76,-30],[68,0],[76,28],[112,36],[150,38],[184,32]],
+    green:[20,24],
+    bunkers:[[12,-19,12,8,"Front-left","L"],[-12,-14,14,5],[-1,21,8,12,"Right bunkers","R"],[12,18,10,6],[46,-8,8,5,"Short bunker","L"]],
+    areas:[
+      {t:"scrub", label:"Native scrub – carry", poly:[[182,-30],[134,-34],[128,0],[134,28],[182,26],[188,0]]},
+      {t:"scrub", label:"Native scrub", poly:[[130,40],[50,44],[4,40],[-22,30],[-30,64],[130,66]]},
+      {t:"waste", label:"Waste & cart path", poly:[[130,-42],[50,-48],[-5,-40],[-28,-30],[-30,-58],[130,-60]]}
+    ],
+    aim:{green:-2}
+  });
 
 
 const COURSE_ORDER=["black","bone","blue"];
