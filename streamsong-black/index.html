@@ -56,6 +56,15 @@
   .vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .vlinks{display:flex;justify-content:space-between;font-size:12px;padding:5px 12px 0}
   .vlinks a,.vlinks button{color:var(--navy);font:600 12px Inter,Arial,sans-serif;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+  .vbox{margin:0 10px;border-radius:10px;overflow:hidden;background:#000}
+  .vbox .ar{position:relative;width:100%;padding-top:70.54%;overflow:hidden;background:#000}
+  .vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+  .vbox .vclose{display:none}
+  .vbox.vfs{position:fixed;inset:0;margin:0;border-radius:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .vbox.vfs .ar{width:min(100vw, calc(100vh / 0.7054));padding-top:0;height:min(100vh, calc(100vw * 0.7054))}
+  .vbox.vfs .vclose{display:block;position:absolute;top:calc(10px + env(safe-area-inset-top));right:12px;z-index:2;background:rgba(255,255,255,.9);color:#000;border:0;border-radius:999px;padding:8px 14px;font:700 13px Inter,Arial,sans-serif;cursor:pointer}
+  .vbox:fullscreen .ar{width:min(100vw, calc(100vh / 0.7054));padding-top:0;height:min(100vh, calc(100vw * 0.7054))}
+  .vbox:fullscreen{display:flex;align-items:center;justify-content:center}
   .ov{border-left:4px solid var(--navy);background:#eef3f8;border-radius:6px;padding:9px 11px;margin:7px 0}
   .ov h3{margin:0 0 3px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
   .ov p{margin:0;font-size:14px;line-height:1.4}
@@ -1116,13 +1125,14 @@ let vidOpen=false;
 const fmtT=t=>`${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
 function renderVideo(C,h){
   const el=document.getElementById("vid"); const v=C.video, seg=v&&v.seg[h.n];
+  const key=`${C.key}-${h.n}-${vidOpen}`; if (el.dataset.key===key) return; el.dataset.key=key;
   const chop=v&&v.chop&&v.chop[h.n];
   if (!seg && !chop){ el.innerHTML=""; return; }
   const yt=seg?`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`:`https://www.youtube.com/watch?v=${v.id}`;
   if (chop){
     el.innerHTML=`<div class="lbl" style="margin:10px 12px 4px">Hole ${h.n} video overview</div>
-      <div style="margin:0 10px;border-radius:10px;overflow:hidden"><div style="position:relative;width:100%;padding-top:70.54%;overflow:hidden;background:#000"><iframe src="https://tubechop.com/videos/${chop}/embed" title="${C.full} - Hole ${h.n}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block"></iframe></div></div>
-      <div class="vlinks"><span style="color:var(--muted)">${seg?`Clip ${fmtT(seg[0])}–${fmtT(seg[1])}`:""}</span><a href="${yt}" target="_blank" rel="noopener">Open in YouTube</a></div>`;
+      <div class="vbox" id="vbox"><button class="vclose" data-vid="exitfs">✕ Close</button><div class="ar"><iframe src="https://tubechop.com/videos/${chop}/embed" title="${C.full} - Hole ${h.n}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen></iframe></div></div>
+      <div class="vlinks"><button data-vid="fs">⛶ Full screen</button><span style="color:var(--muted)">${seg?`Clip ${fmtT(seg[0])}–${fmtT(seg[1])}`:""}</span><a href="${yt}" target="_blank" rel="noopener">Open in YouTube</a></div>`;
     return;
   }
   if (!vidOpen){
@@ -1134,10 +1144,24 @@ function renderVideo(C,h){
 }
 document.getElementById("vid").addEventListener("click", e=>{
   const b=e.target.closest("[data-vid]"); if (!b) return;
-  e.stopPropagation(); vidOpen = b.dataset.vid==="open";
+  e.stopPropagation();
+  if (b.dataset.vid==="fs"){ const vb=document.getElementById("vbox"); if (!vb) return;
+    const req=vb.requestFullscreen||vb.webkitRequestFullscreen;
+    vb.classList.add("vfs"); document.body.style.overflow="hidden";
+    if (req){ try{ const p=req.call(vb); if (p&&p.catch) p.catch(()=>{}); }catch(err){} }
+    try{ screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape").catch(()=>{}); }catch(err){}
+    return; }
+  if (b.dataset.vid==="exitfs"){ exitVidFs(); return; }
+  vidOpen = b.dataset.vid==="open";
   renderVideo(COURSES[state.course], HOLES[state.hole]);
 });
-function go(i){ vidOpen=false; state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
+function exitVidFs(){ const vb=document.getElementById("vbox"); if (vb) vb.classList.remove("vfs"); document.body.style.overflow="";
+  const fe=document.fullscreenElement||document.webkitFullscreenElement; const ex=document.exitFullscreen||document.webkitExitFullscreen;
+  if (fe && ex){ try{ const p=ex.call(document); if (p&&p.catch) p.catch(()=>{}); }catch(err){} }
+  try{ screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); }catch(err){} }
+document.addEventListener("fullscreenchange", ()=>{ if (!document.fullscreenElement){ const vb=document.getElementById("vbox"); if (vb) vb.classList.remove("vfs"); document.body.style.overflow=""; } });
+document.addEventListener("keydown", e=>{ if (e.key==="Escape") exitVidFs(); });
+function go(i){ vidOpen=false; exitVidFs(); state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
 function goHome(){ state.view="home"; try{ history.replaceState(null,"","#home"); }catch(e){ location.hash="home"; } render(); window.scrollTo(0,0); }
 document.addEventListener("click", e=>{
   const hb=e.target.closest("[data-home]"); if (hb){ goHome(); return; }
