@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Wider Cup">
 <meta name="theme-color" content="#0b1b2b">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -164,6 +165,8 @@
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
   .hdrlink{align-self:center;margin:4px 6px 0;flex:none;white-space:nowrap;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
   .rfbtn{margin-left:auto;margin-right:0}
+  .lv{font:600 10px Inter,Arial,sans-serif;margin-left:8px;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.12);color:#cbd5e1;letter-spacing:.02em;text-transform:none;vertical-align:2px}
+  .lv.live{color:#86efac}.lv.connecting{color:#fde68a}.lv.error{color:#fca5a5}
   .homebtn{white-space:nowrap;flex:none}
   #h-kicker{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   @media (max-width:400px){ .rfw{display:none} }
@@ -1047,6 +1050,62 @@ function matchStatus(match){
 const ACT=()=>RC.m.slice(0, RC.count||1);
 const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""); };
 
+
+// ---------------- Shared live scoring (Supabase) ----------------
+const SUPA_URL="https://wwegxwnphtffdsmrgrpj.supabase.co", SUPA_KEY="sb_publishable_6DwDGJXoDulFBijqL7rbAA_fI0cZKZL";
+let sb=null, liveState="off", liveCh=null;
+function sbInit(){ if (sb) return sb; try{ if (window.supabase && window.supabase.createClient) sb=window.supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:false}}); }catch(e){ sb=null; } return sb; }
+function settingsData(){ return {teams:RC.teams, single:RC.single, count:RC.count||1, net:RC.net, m:RC.m.map(m=>({players:m.players, hcp:m.hcp}))}; }
+function applySettings(d){ if (!d) return; if (d.teams) RC.teams=d.teams; if (d.single!==undefined) RC.single=d.single; if (d.count) RC.count=d.count; if (d.net!==undefined) RC.net=d.net;
+  (d.m||[]).forEach((x,i)=>{ if (RC.m[i]){ if (x.players) RC.m[i].players=x.players; if (x.hcp) RC.m[i].hcp=x.hcp; } }); }
+function setScore(r, v){ const m=RC.m[r.match]; if (!m) return; if (!m.scores[r.hole]) m.scores[r.hole]=[[null,null],[null,null]]; m.scores[r.hole][r.side][r.player]=v; }
+function localRows(key){ const rows=[]; RC.m.forEach((m,mi)=>Object.keys(m.scores).forEach(h=>{ const sc=m.scores[h]; [0,1].forEach(sd=>[0,1].forEach(pl=>{ const v=sc&&sc[sd]&&sc[sd][pl]; if (v!=null) rows.push({course:key, match:mi, hole:+h, side:sd, player:pl, score:v}); })); })); return rows; }
+function liveRefresh(){ saveRC(); renderRC(); if (state.view==="home") renderHome(); }
+async function liveLoad(key){
+  if (!sbInit()){ liveState="off"; return; }
+  liveState="connecting"; renderRC();
+  try{
+    const [sc, st] = await Promise.all([ sb.from("golf_scores").select("*").eq("course", key), sb.from("golf_settings").select("data").eq("course", key).maybeSingle() ]);
+    if (sc.error) throw sc.error;
+    if (key!==RC_KEY) return;
+    const server=sc.data||[], seen=new Set(server.map(r=>`${r.match}-${r.hole}-${r.side}-${r.player}`));
+    const mine=localRows(key).filter(r=>!seen.has(`${r.match}-${r.hole}-${r.side}-${r.player}`));   // scores entered offline on this phone
+    if (st.data && st.data.data) applySettings(st.data.data); else await pushSettings();
+    RC.m.forEach(m=>m.scores={}); server.forEach(r=>setScore(r, r.score)); mine.forEach(r=>setScore(r, r.score));
+    if (mine.length) await sb.from("golf_scores").upsert(mine);
+    liveState="live"; liveRefresh(); liveSubscribe(key);
+  }catch(e){ liveState="error"; renderRC(); }
+}
+function liveSubscribe(key){
+  try{ if (liveCh) sb.removeChannel(liveCh); }catch(e){}
+  liveCh = sb.channel("golf-"+key)
+    .on("postgres_changes", {event:"*", schema:"public", table:"golf_scores", filter:"course=eq."+key}, p=>{
+      if (key!==RC_KEY) return;
+      if (p.eventType==="DELETE"){ if (p.old && p.old.hole) setScore(p.old, null); else { liveLoad(key); return; } }
+      else if (p.new) setScore(p.new, p.new.score);
+      liveRefresh(); })
+    .on("postgres_changes", {event:"*", schema:"public", table:"golf_settings", filter:"course=eq."+key}, p=>{
+      if (key===RC_KEY && p.new && p.new.data){ applySettings(p.new.data); liveRefresh(); } })
+    .subscribe(status=>{ if (status==="SUBSCRIBED") liveState="live"; else if (status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED") liveState="error"; renderRC(); });
+}
+async function liveWrite(mi, side, player, hole, v){
+  if (!sbInit()) return;
+  try{
+    const r = v==null
+      ? await sb.from("golf_scores").delete().match({course:RC_KEY, match:mi, hole, side, player})
+      : await sb.from("golf_scores").upsert({course:RC_KEY, match:mi, hole, side, player, score:v, updated_at:new Date().toISOString()});
+    if (r.error) throw r.error; if (liveState!=="live"){ liveState="live"; renderRC(); }
+  }catch(e){ liveState="error"; renderRC(); toast("Not synced – saved on this phone"); }
+}
+async function liveClear(hole){
+  if (!sbInit()) return;
+  try{ let q=sb.from("golf_scores").delete().eq("course", RC_KEY); if (hole!=null) q=q.eq("hole", hole); const r=await q; if (r.error) throw r.error; }catch(e){ liveState="error"; renderRC(); }
+}
+let setTimer=null;
+function pushSettings(){ if (!sbInit()) return Promise.resolve(); clearTimeout(setTimer);
+  return new Promise(res=>{ setTimer=setTimeout(async ()=>{ try{ await sb.from("golf_settings").upsert({course:RC_KEY, data:settingsData(), updated_at:new Date().toISOString()}); }catch(e){} res(); }, 400); }); }
+document.addEventListener("visibilitychange", ()=>{ if (document.visibilityState==="visible" && sb) liveLoad(RC_KEY); });
+
 function renderRCcompact(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole], m=RC.m[0];
   const st=matchStatus(m), r=st.res[hole], sc=m.scores[hole]||[[null,null],[null,null]];
@@ -1066,7 +1125,8 @@ function renderRCcompact(){
   el.innerHTML=h;
   if (RC.det && RC.setup){ const save=RC.open; RC.open=true; const tmp=document.createElement("div"); const cur=el.innerHTML; renderRCfull(true); const setupHtml=(el.querySelector(".setup")||{}).outerHTML||""; el.innerHTML=cur; el.querySelector(".rc-body").insertAdjacentHTML("beforeend", setupHtml); RC.open=save; }
 }
-function renderRC(){ if (RC.single && (RC.count||1)===1) return renderRCcompact(); return renderRCfull(); }
+function renderRC(){ if (RC.single && (RC.count||1)===1) renderRCcompact(); else renderRCfull();
+  const hb=document.querySelector("#rc .rc-head b"); if (hb && liveState!=="off") hb.insertAdjacentHTML("beforeend", `<span class="lv ${liveState}">${liveState==="live"?"● Live":liveState==="connecting"?"● Syncing":"● Offline"}</span>`); }
 function renderRCfull(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole];
   const st=ACT().map(matchStatus);
@@ -1137,8 +1197,8 @@ document.getElementById("rc").addEventListener("click", e=>{
   const act=b.dataset.act, hole=state.hole+1;
   if (act==="toggle"){ if (RC.single && (RC.count||1)===1) RC.det=!RC.det; else RC.open=!RC.open; }
   else if (act==="setup"){ RC.setup=!RC.setup; }
-  else if (act==="count"){ RC.count=+b.dataset.c; }
-  else if (act==="single"){ RC.single=b.dataset.v==="1"; }
+  else if (act==="count"){ RC.count=+b.dataset.c; pushSettings(); }
+  else if (act==="single"){ RC.single=b.dataset.v==="1"; pushSettings(); }
   else if (act==="inc"||act==="dec"){
     const m=RC.m[+b.dataset.m], s=+b.dataset.s, p=+b.dataset.p;
     if (!m.scores[hole]) m.scores[hole]=[[null,null],[null,null]];
@@ -1146,12 +1206,13 @@ document.getElementById("rc").addEventListener("click", e=>{
     if (v==null) v=HOLES[state.hole].par; else v += act==="inc"?1:-1;
     if (v<1) v=null; if (v!=null && v>15) v=15;
     m.scores[hole][s][p]=v;
+    liveWrite(+b.dataset.m, s, p, hole, v);
   }
   else if (act==="goto"){ go(+b.dataset.h-1); return; }
   else if (act==="copy"){ const t=rcText(); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Results copied – paste into WhatsApp")).catch(()=>{ window.prompt("Copy the results:", t); }); return; }
   else if (act==="csv"){ const blob=new Blob([rcCSV()],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`streamsong-${state.course}-scores-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast("CSV downloaded"); return; }
-  else if (act==="clearhole"){ ACT().forEach(m=>delete m.scores[hole]); toast(`Hole ${hole} cleared`); }
-  else if (act==="reset"){ if (b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Tap again to reset"; return; } RC.m.forEach(m=>m.scores={}); toast("All scores reset"); }
+  else if (act==="clearhole"){ ACT().forEach(m=>delete m.scores[hole]); liveClear(hole); toast(`Hole ${hole} cleared`); }
+  else if (act==="reset"){ if (b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Tap again to reset"; return; } RC.m.forEach(m=>m.scores={}); liveClear(null); toast("All scores reset"); }
   saveRC(); renderRC();
 });
 document.getElementById("rc").addEventListener("change", e=>{
@@ -1161,13 +1222,13 @@ document.getElementById("rc").addEventListener("change", e=>{
   if (f==="net") RC.net=e.target.checked;
   if (f==="name") RC.m[mi].players[s][p]=e.target.value.trim()||`P${p+1}`;
   if (f==="hcp") RC.m[mi].hcp[s][p]=Math.max(0,Math.min(54,Number(e.target.value)||0));
-  saveRC(); renderRC();
+  saveRC(); renderRC(); pushSettings();
 });
 
 function setCourse(key){
   if (!COURSES[key]) key="black";
   state.course=key; HOLES=COURSES[key].holes;
-  if (RC_KEY!==key){ RC=loadRC(key); RC_KEY=key; }
+  if (RC_KEY!==key){ RC=loadRC(key); RC_KEY=key; liveLoad(key); }
 }
 function renderHome(){
   const today=new Date(); const iso=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
@@ -1290,6 +1351,7 @@ let sx=null; document.getElementById("mapwrap").addEventListener("touchstart",e=
 document.getElementById("mapwrap").addEventListener("touchend",e=>{ if(sx===null)return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>60) go(state.hole+(dx<0?1:-1)); sx=null; });
 setCourse(state.course);
 render();
+liveLoad(RC_KEY);
 
 // ---------------- Print (all 18 holes, Black tee, 210 drive) ----------------
 function buildPrint(tee="Black", drive=210){
