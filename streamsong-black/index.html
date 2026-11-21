@@ -676,6 +676,25 @@ const BLUE_OV = [
 ];
 BONE_HOLES.forEach((h,i)=>h.overview=BONE_OV[i]);
 BLUE_HOLES.forEach((h,i)=>h.overview=BLUE_OV[i]);
+// Bone Valley hole 1: shaped from the course video
+Object.assign(BONE_HOLES[0],{
+    path:[[0,-2],[170,0],[300,6],[425,4]],
+    fw:[],
+    fwPoly:[[338,4],[318,-10],[292,-24],[255,-34],[215,-37],[182,-33],[150,-24],[115,-18],[80,-15],[48,-14],[26,-16],[14,-6],[14,12],[30,22],[60,28],[100,36],[140,42],[185,45],[230,42],[272,36],[305,28],[330,20],[345,12]],
+    roughPoly:[[402,-6],[340,-6],[310,-30],[268,-46],[214,-49],[178,-42],[150,-32],[110,-26],[70,-24],[30,-26],[-6,-24],[-24,-6],[-24,20],[0,34],[50,40],[100,48],[150,54],[205,58],[260,52],[310,42],[352,30],[402,16]],
+    green:[24,12],
+    bunkers:[[3,27,9,12,"Sand right/long","R"],[-13,15,11,6]],
+    areas:[
+      {t:"waste", label:"Waste area", poly:[[400,-6],[384,0],[352,-2],[322,-10],[302,-26],[296,-46],[312,-63],[348,-70],[384,-62],[402,-40]]},
+      {t:"scrub", label:"", poly:[[352,-34],[343,-28],[336,-36],[344,-44]]},
+      {t:"scrub", label:"", poly:[[372,-20],[365,-14],[358,-22],[366,-28]]},
+      {t:"water", label:"Lake", poly:[[186,-36],[160,-29],[124,-22],[88,-19],[52,-18],[24,-20],[2,-26],[-14,-36],[-20,-56],[-2,-74],[50,-84],[110,-82],[160,-70],[192,-54]]},
+      {t:"scrub", label:"Native scrub", poly:[[398,22],[350,26],[300,36],[245,48],[205,54],[200,72],[262,76],[330,66],[398,52]]},
+      {t:"mound", label:"Dirt mound", poly:[[120,46],[92,44],[64,46],[56,58],[78,68],[112,66],[126,56]]}
+    ],
+    aim:{tee:10,green:3}
+  });
+
 
 const COURSE_ORDER=["black","bone","blue"];
 let HOLES = BLACK_HOLES;
@@ -744,15 +763,20 @@ function build(h){
   for (let pass=0; pass<3; pass++) for (let i=1;i<samples.length-1;i++) samples[i][0]=(samples[i-1][0]+samples[i][0]+samples[i+1][0])/3;
   const c = samples.map(([l,d])=>[l*K, d*K]);
   const g = {centre:c, fw:[], bunkers:[], areas:[]};
-  const fwMax = Math.max(18, ...h.fw.map(f=>f[2]/2+Math.abs(f[3]||0)));
+  const PP = pts => pts.map(([d,l])=>pointAtPx(c,d,l*K));
+  const fwMax = h.fwPoly ? Math.max(18, ...h.fwPoly.map(q=>Math.abs(q[1]))) : Math.max(18, ...h.fw.map(f=>f[2]/2+Math.abs(f[3]||0)));
   const env = (h.par===3) ? 40 : fwMax+30;
   g.native = band(c, -38, maxT+16, -(env+28), env+28);
   if (h.par===3){
     g.rough = band(c, -24, 34, -36, 36);
   } else {
-    g.rough = band(c, -24, Math.max(...h.fw.map(f=>f[1]))+12, -(fwMax+16), fwMax+16);
+    g.rough = band(c, -24, (h.fw.length ? Math.max(...h.fw.map(f=>f[1])) : Math.max(...(h.fwPoly||[[300,0]]).map(q=>q[0])))+12, -(fwMax+16), fwMax+16);
   }
   h.fw.forEach(([a,b,w,lat])=>g.fw.push(band(c, a, b, (lat||0)-w/2, (lat||0)+w/2)));
+  if (h.fwPoly){
+    g.fw=[closedPath(chaikin(PP(h.fwPoly),3))];
+    g.rough=closedPath(chaikin(PP(h.roughPoly || h.fwPoly.map(([d,l])=>[d+(d>200?6:-4), l+(l<0?-11:11)])),3));
+  }
   const gp = pointAtPx(c,0,0);
   g.green = blob(gp.x, gp.y, h.green[0]*K, h.green[1]*K, gp.ang, h.n);
   const teeMin = Math.min(...Object.values(h.tees)), tA=pointAtPx(c,teeMin-6,0);
@@ -762,6 +786,13 @@ function build(h){
     g.bunkers.push({d:blob(p.x,p.y,w/2*K,hh/2*K,p.ang,h.n*3+i), label, side, x:p.x, y:p.y, w:w*K});
   });
   h.areas.forEach(a=>{
+    if (a.poly){
+      const ds=a.poly.map(q=>q[0]), ls=a.poly.map(q=>q[1]);
+      a.d1=Math.min(...ds); a.d2=Math.max(...ds); a.l1=Math.min(...ls); a.l2=Math.max(...ls);
+      const mid=pointAtPx(c,(a.d1+a.d2)/2,(a.l1+a.l2)/2*K);
+      g.areas.push({t:a.t, d:closedPath(chaikin(PP(a.poly),3)), label:a.label, x:mid.x, y:mid.y, long:(a.d2-a.d1)>(a.l2-a.l1)*1.6, ang:mid.ang});
+      return;
+    }
     const mid=pointAtPx(c,(a.d1+a.d2)/2,(a.l1+a.l2)/2*K);
     g.areas.push({t:a.t, d:band(c,a.d1,a.d2,a.l1,a.l2), label:a.label, x:mid.x, y:mid.y, long:(a.d2-a.d1)>(a.l2-a.l1)*1.6, ang:mid.ang});
   });
@@ -844,8 +875,8 @@ function svgFor(h, tee, drive, pxW, pxH){
   } else {
     s.push(`<path d="${g.native}" fill="#b49a6a" opacity=".5"/><path d="${g.rough}" fill="#8db36a"/>`);
     const drawAreas=()=>g.areas.forEach(a=>{
-      const fill = a.t==="water" ? "#7fb6d9" : a.t==="scrub" ? `url(#scrub${id})` : a.t==="rise" ? `url(#rise${id})` : a.t==="native" ? `url(#native${id})` : a.t==="slope" ? "rgba(31,157,92,.25)" : `url(#sand${id})`;
-      const stroke = a.t==="water" ? "#5d97bd" : a.t==="slope" ? "#1f9d5c" : "#cbb98a";
+      const fill = a.t==="mound" ? "#9c6b4e" : a.t==="water" ? "#7fb6d9" : a.t==="scrub" ? `url(#scrub${id})` : a.t==="rise" ? `url(#rise${id})` : a.t==="native" ? `url(#native${id})` : a.t==="slope" ? "rgba(31,157,92,.25)" : `url(#sand${id})`;
+      const stroke = a.t==="mound" ? "#7a5038" : a.t==="water" ? "#5d97bd" : a.t==="slope" ? "#1f9d5c" : "#cbb98a";
       if (a.t!=="native" && a.t!=="slope") s.push(`<path d="${a.d}" fill="none" stroke="#e3a33b" stroke-width="${5*U}" stroke-opacity=".55" stroke-linejoin="round"/>`);
       s.push(`<path d="${a.d}" fill="${fill}" stroke="${stroke}" stroke-width="2" ${a.t==="slope"?'stroke-dasharray="6 5"':''}/>`);
       if (a.label){
