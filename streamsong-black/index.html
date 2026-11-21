@@ -8,6 +8,8 @@
 <link rel="icon" href="img/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Wider Cup">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b1b2b">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -204,7 +206,7 @@
 </head>
 <body>
 <div id="home" class="wrap">
-  <div class="home-hero" style="position:relative"><button class="homebtn rfbtn" data-refresh="1" aria-label="Refresh" style="position:absolute;top:12px;right:12px">⟳ Refresh</button><img class="herobadge" src="img/wider-cup-256.png" alt="Wider Cup badge"><div class="kicker">Wider Cup · Streamsong 2026</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
+  <div class="home-hero" style="position:relative"><button class="homebtn rfbtn" data-refresh="1" aria-label="Refresh" style="position:absolute;top:12px;right:12px">⟳ Refresh</button><button class="homebtn" id="alertbtn" style="position:absolute;top:12px;left:12px">🔔 Alerts</button><img class="herobadge" src="img/wider-cup-256.png" alt="Wider Cup badge"><div class="kicker">Wider Cup · Streamsong 2026</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
   <div class="days" id="days"></div>
   <footer>Each day keeps its own scores on this phone. Course data: official and published scorecards; hole notes from the field guide (Black) and published reviews (Bone Valley, Blue).</footer>
 </div>
@@ -1067,7 +1069,7 @@ const getPin=(side,m)=>{ try{ return localStorage.getItem("ssb-pin-"+side+"-"+m)
 const setPin=(side,m,v)=>{ try{ v==null?localStorage.removeItem("ssb-pin-"+side+"-"+m):localStorage.setItem("ssb-pin-"+side+"-"+m,v); }catch(e){} };
 const anyPin=()=>getPin(0,0)||getPin(0,1)||getPin(1,0)||getPin(1,1);
 function askPin(side, m, done){
-  const who = side<0 ? "your team" : teamName(RC.matches[m]||{players:[]}, m, side);
+  const who = side<0 ? "your team" : teamName(RC.m[m]||{players:[]}, m, side);
   const bg=document.createElement("div"); bg.className="pinbg";
   bg.innerHTML=`<div class="pinbox"><h3>${who} PIN</h3><p>${side<0?"Enter your side's PIN to change set-up.":`Enter the ${who} PIN to enter ${who} scores. You only need to do this once on this phone.`}</p>
     <input type="password" inputmode="numeric" autocomplete="off" maxlength="8"><div class="pe"></div><div class="pb"><button class="cx">Cancel</button><button class="ok">OK</button></div></div>`;
@@ -1088,6 +1090,35 @@ function askPin(side, m, done){
   };
   bg.querySelector(".ok").onclick=go;
   inp.addEventListener("keydown",e=>{ if (e.key==="Enter") go(); });
+}
+
+// ---------------- iPhone alerts (web push) ----------------
+const VAPID_PUB="BF0caKIPbxbsHgI9WtshzEjX3boE6WmyDu5nS8YOcTEmTjWZYsUN1w-FyI1UCh3Kd0sQ6xKjKAVmVH6FAaJI4uU";
+const alertsOn=()=>{ try{ return localStorage.getItem("ssb-alerts")==="1"; }catch(e){ return false; } };
+function alertBtn(){ const b=document.getElementById("alertbtn"); if (b) b.textContent = alertsOn() ? "🔔 Alerts on" : "🔔 Alerts"; }
+async function enableAlerts(){
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)){
+    toast(ios && !navigator.standalone ? "Share ▸ Add to Home Screen, then open from the icon" : "Alerts not supported here"); return; }
+  try{
+    const perm = await Notification.requestPermission();
+    if (perm!=="granted"){ toast("Alerts blocked – allow in Settings ▸ Notifications"); return; }
+    const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+    const k = Uint8Array.from(atob(VAPID_PUB.replace(/-/g,"+").replace(/_/g,"/")), c=>c.charCodeAt(0));
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:k});
+    if (!sbInit()) throw new Error("offline");
+    const r = await sb.rpc("golf_push_subscribe",{p_sub: sub.toJSON()}); if (r.error) throw r.error;
+    try{ localStorage.setItem("ssb-alerts","1"); }catch(e){}
+    alertBtn(); toast("Alerts on ✓");
+  }catch(e){ toast("Couldn't turn on alerts – try again"); }
+}
+function notifyHole(mi, side, hole){
+  const m=RC.m[mi]; if (!m || !sb) return; const r=holeResult(m,hole); if (!r.done) return;
+  const tn=s=>teamName(m,mi,s), st=matchStatus(m), c=COURSES[RC_KEY];
+  const res = r.winner==null ? "halved" : `${tn(r.winner)} win`;
+  sb.functions.invoke("golf-notify",{body:{pin:getPin(side,mi), course:RC_KEY, match:mi, hole,
+    title:`${c?c.name:"Wider Cup"} · ${tn(0)} v ${tn(1)}`,
+    body:`Hole ${hole} ${res} (${r.best[0]}–${r.best[1]}). ${st.text}`, url:`./#${RC_KEY}-hole-${hole}`}}).catch(()=>{});
 }
 
 // ---------------- Shared live scoring (Supabase) ----------------
@@ -1132,6 +1163,7 @@ async function liveWrite(mi, side, player, hole, v){
   try{
     const r = await sb.rpc("golf_set_score",{p_pin:getPin(side,mi), p_course:RC_KEY, p_match:mi, p_hole:hole, p_side:side, p_player:player, p_score:v});
     if (r.error) throw r.error; if (liveState!=="live"){ liveState="live"; renderRC(); }
+    if (v!=null) notifyHole(mi, side, hole);
   }catch(e){
     if (/PIN/i.test((e&&e.message)||"")){ setPin(side,mi,null); toast("Wrong PIN – score not saved"); liveLoad(RC_KEY); return; }
     liveState="error"; renderRC(); toast("Not synced – saved on this phone"); }
@@ -1417,6 +1449,7 @@ function buildPrint(tee="Black", drive=210){
 }
 buildPrint();
 window.addEventListener("beforeprint", ()=>buildPrint());
+document.getElementById("alertbtn").addEventListener("click",()=>enableAlerts()); alertBtn();
 </script>
 </body>
 </html>
