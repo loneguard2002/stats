@@ -175,6 +175,17 @@
   .pinbox .pe{color:#c62828;font-size:12px;min-height:16px;margin:6px 0 2px}
   .pinbox .pb{display:flex;gap:8px;margin-top:6px}
   .pinbox .pb button{flex:1;border:0;border-radius:10px;padding:10px;font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+  .sbtn{border:0;background:#fff;color:var(--navy);font:700 11.5px Inter,Arial,sans-serif;border-radius:999px;padding:4px 9px;margin-left:8px;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+  .board{background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:12px 12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .board h3{margin:0;font:700 17px Inter,Arial,sans-serif;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+  .board .x{border:0;background:#eef3f8;color:var(--navy);border-radius:999px;width:30px;height:30px;font-size:16px;cursor:pointer}
+  .board .mh{display:flex;justify-content:space-between;font:700 13px Inter,Arial,sans-serif;margin:12px 0 4px}
+  .board table{border-collapse:collapse;width:100%;font-size:12px;margin-bottom:4px;table-layout:fixed}
+  .board th,.board td{border:1px solid var(--line);text-align:center;padding:4px 0}
+  .board th{background:#f4f7fa;color:var(--muted);font-weight:600}
+  .board td.nm,.board th.nm{width:62px;text-align:left;padding-left:4px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .board td.w0{background:#dbe7ff;color:#1d4ed8;font-weight:700}.board td.w1{background:#fde0e0;color:#c62828;font-weight:700}
+  .board td.t{font-weight:700;background:#f4f7fa}
   .pinbox .ok{background:var(--navy);color:#fff}.pinbox .cx{background:#eef3f8;color:var(--navy)}
   .lv{display:block;width:fit-content;margin-top:3px;font:600 10px Inter,Arial,sans-serif;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.12);color:#cbd5e1;letter-spacing:.02em;text-transform:none;vertical-align:2px}
   .lv.live{color:#86efac}.lv.connecting{color:#fde68a}.lv.error{color:#fca5a5}
@@ -1236,7 +1247,7 @@ function renderRCcompact(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole], m=RC.m[0];
   const st=matchStatus(m), r=st.res[hole], sc=m.scores[hole]||[[null,null],[null,null]];
   const cls = st.diff>0?"eu":st.diff<0?"us":"";
-  let h=`<div class="rc-head" data-act="toggle" style="padding:7px 12px"><b>Best ball</b><span class="rc-score"><span class="${cls}" style="font-size:13px">${st.text}</span><span class="chev">${RC.det?"▲":"▼"}</span></span></div>`;
+  let h=`<div class="rc-head" data-act="toggle" style="padding:7px 12px"><b>Best ball<button class="sbtn" data-act="board">📊 Scores</button></b><span class="rc-score"><span class="${cls}" style="font-size:13px">${st.text}</span><span class="chev">${RC.det?"▲":"▼"}</span></span></div>`;
   const team=side=>{ const v=sc[side][0], k=strokesFor(m,side,0,hole); const win=r&&r.done&&r.winner===side;
     return `<div class="tm ${win?'win':''}"><div class="tag ${TEAM_CLS[side]}">${RC.teams[side].slice(0,3).toUpperCase()}</div>${k?`<span class="dots">${"●".repeat(k)}</span>`:""}<span class="stp"><button data-act="dec" data-m="0" data-s="${side}" data-p="0" aria-label="minus">−</button><span class="v">${v==null?"–":v}</span><button data-act="inc" data-m="0" data-s="${side}" data-p="0" aria-label="plus">+</button></span></div>`; };
   const mid = !r||!r.done ? `<b>H${hole}</b>Par ${H.par}` : r.winner==null ? `<b>H${hole}</b>Halved` : `<b>H${hole}</b><span style="color:${r.winner?'#c62828':'#1d4ed8'}">${RC.teams[r.winner].slice(0,3).toUpperCase()} win</span>`;
@@ -1251,14 +1262,37 @@ function renderRCcompact(){
   el.innerHTML=h;
   if (RC.det && RC.setup){ const save=RC.open; RC.open=true; const tmp=document.createElement("div"); const cur=el.innerHTML; renderRCfull(true); const setupHtml=(el.querySelector(".setup")||{}).outerHTML||""; el.innerHTML=cur; el.querySelector(".rc-body").insertAdjacentHTML("beforeend", setupHtml); RC.open=save; }
 }
+function boardHTML(){
+  const c=COURSES[RC_KEY], st=ACT().map(matchStatus);
+  let h=`<h3><span>${c?c.name:"Scores"}</span><button class="x" data-bx="1" aria-label="Close">✕</button></h3>`;
+  if ((RC.count||1)>1){ const tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0)); h+=`<div style="font:700 14px Inter,Arial,sans-serif;margin-top:4px"><span class="eu">${RC.teams[0]} ${fmtPts(tot[0])}</span> – <span class="us">${fmtPts(tot[1])} ${RC.teams[1]}</span></div>`; }
+  ACT().forEach((m,mi)=>{
+    const S=st[mi], col=S.diff>0?"#1d4ed8":S.diff<0?"#c62828":"var(--ink)";
+    const val=(n,side)=>{ const sc=(m.scores[n]||[[null,null],[null,null]])[side]; if (RC.single) return sc[0]; const v=sc.filter(x=>x!=null); return v.length?Math.min(...v):null; };
+    h+=`<div class="mh"><span>${(RC.count||1)>1?`Match ${mi+1}: `:""}${teamName(m,mi,0)} v ${teamName(m,mi,1)}</span><span style="color:${col}">${S.text}</span></div>`;
+    const tbl=(a,b,lab,tot)=>{ let t=`<table><tr><th class="nm">Hole</th>`; for(let n=a;n<=b;n++) t+=`<th>${n}</th>`; t+=`<th>${lab}</th>${tot?"<th>Tot</th>":""}</tr><tr><th class="nm">Par</th>`;
+      let pp=0; for(let n=a;n<=b;n++){ pp+=HOLES[n-1].par; t+=`<th>${HOLES[n-1].par}</th>`; } const pAll=HOLES.reduce((x,H)=>x+H.par,0); t+=`<th>${pp}</th>${tot?`<th>${pAll}</th>`:""}</tr>`;
+      [0,1].forEach(side=>{ t+=`<tr><td class="nm ${TEAM_CLS[side]}">${teamName(m,mi,side)}</td>`; let s=0,k=0,sa=0,ka=0;
+        for(let n=a;n<=b;n++){ const v=val(n,side), r=S.res[n]; if(v!=null){s+=v;k++;} t+=`<td class="${r&&r.done&&r.winner===side?"w"+side:""}">${v==null?"":v}</td>`; }
+        for(let n=1;n<=18;n++){ const v=val(n,side); if(v!=null){sa+=v;ka++;} }
+        t+=`<td class="t">${k?s:""}</td>${tot?`<td class="t">${ka?sa:""}</td>`:""}</tr>`; });
+      return t+`</table>`; };
+    h+=tbl(1,9,"Out",false)+tbl(10,18,"In",true);
+  });
+  return h+`<div style="font-size:11.5px;color:var(--muted);margin-top:6px">Gross scores. Shaded = hole won${RC.net?" (after strokes)":""}.</div>`;
+}
+function showBoard(){ let bg=document.getElementById("boardbg"); if (!bg){ bg=document.createElement("div"); bg.id="boardbg"; bg.className="pinbg";
+    bg.addEventListener("click",e=>{ if (e.target===bg || e.target.closest("[data-bx]")) bg.remove(); }); document.body.appendChild(bg); }
+  bg.innerHTML=`<div class="board">${boardHTML()}</div>`; }
 function renderRC(){ if (RC.single && (RC.count||1)===1) renderRCcompact(); else renderRCfull();
+  if (document.getElementById("boardbg")) showBoard();
   const hb=document.querySelector("#rc .rc-head b"); if (hb && liveState!=="off") hb.insertAdjacentHTML("beforeend", `<span class="lv ${liveState}">${liveState==="live"?"● Live":liveState==="connecting"?"● Syncing":"● Offline"}</span>`); }
 function renderRCfull(){
   const el=document.getElementById("rc"), hole=state.hole+1, H=HOLES[state.hole];
   const st=ACT().map(matchStatus);
   const tot=[0,1].map(i=>st.reduce((a,x)=>a+x.pts[i],0));
   const live=st.some(x=>!x.final && x.text!=="Not started");
-  let h=`<div class="rc-head" data-act="toggle"><b>${(RC.count||1)>1?"Ryder Cup · Four-ball":"Best ball"}</b><span class="rc-score">${(RC.count||1)>1?`<span class="eu">${RC.teams[0]} ${fmtPts(tot[0])}</span>–<span class="us">${fmtPts(tot[1])} ${RC.teams[1]}</span>`:`<span class="${st[0].diff>0?'eu':st[0].diff<0?'us':''}" style="font-size:13px">${st[0].text}</span>`}<span style="font-size:10px;font-weight:500;opacity:.8">${live?"live":""}</span><span class="chev">${RC.open?"▲":"▼"}</span></span></div>`;
+  let h=`<div class="rc-head" data-act="toggle"><b>${(RC.count||1)>1?"Ryder Cup · Four-ball":"Best ball"}<button class="sbtn" data-act="board">📊 Scores</button></b><span class="rc-score">${(RC.count||1)>1?`<span class="eu">${RC.teams[0]} ${fmtPts(tot[0])}</span>–<span class="us">${fmtPts(tot[1])} ${RC.teams[1]}</span>`:`<span class="${st[0].diff>0?'eu':st[0].diff<0?'us':''}" style="font-size:13px">${st[0].text}</span>`}<span style="font-size:10px;font-weight:500;opacity:.8">${live?"live":""}</span><span class="chev">${RC.open?"▲":"▼"}</span></span></div>`;
   if (RC.open){
     h+=`<div class="rc-body">`;
     ACT().forEach((m,mi)=>{
@@ -1321,6 +1355,7 @@ document.getElementById("rc").addEventListener("click", e=>{
   const b=e.target.closest("[data-act]"); if (!b) return;
   e.stopPropagation();
   const act=b.dataset.act, hole=state.hole+1;
+  if (act==="board"){ e.stopPropagation(); showBoard(); return; }
   if ((act==="inc"||act==="dec") && sbInit() && !getPin(+b.dataset.s, +b.dataset.m)){
     const sel=`#rc [data-act="${act}"][data-m="${b.dataset.m}"][data-s="${b.dataset.s}"][data-p="${b.dataset.p}"]`;
     askPin(+b.dataset.s, +b.dataset.m, ()=>{ const nb=document.querySelector(sel); if (nb) nb.click(); }); return; }
