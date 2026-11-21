@@ -1063,11 +1063,11 @@ const fmtPts=x=>{ const w=Math.floor(x), h=x-w>0; return (w||!h?w:"")+(h?"½":""
 
 
 // ---------------- Team PINs ----------------
-const getPin=side=>{ try{ return localStorage.getItem("ssb-pin-"+side); }catch(e){ return null; } };
-const setPin=(side,v)=>{ try{ v==null?localStorage.removeItem("ssb-pin-"+side):localStorage.setItem("ssb-pin-"+side,v); }catch(e){} };
-const anyPin=()=>getPin(0)||getPin(1);
-function askPin(side, done){
-  const who = side<0 ? "your team" : RC.teams[side];
+const getPin=(side,m)=>{ try{ return localStorage.getItem("ssb-pin-"+side+"-"+m); }catch(e){ return null; } };
+const setPin=(side,m,v)=>{ try{ v==null?localStorage.removeItem("ssb-pin-"+side+"-"+m):localStorage.setItem("ssb-pin-"+side+"-"+m,v); }catch(e){} };
+const anyPin=()=>getPin(0,0)||getPin(0,1)||getPin(1,0)||getPin(1,1);
+function askPin(side, m, done){
+  const who = side<0 ? "your team" : teamName(RC.matches[m]||{players:[]}, m, side);
   const bg=document.createElement("div"); bg.className="pinbg";
   bg.innerHTML=`<div class="pinbox"><h3>${who} PIN</h3><p>${side<0?"Enter your side's PIN to change set-up.":`Enter the ${who} PIN to enter ${who} scores. You only need to do this once on this phone.`}</p>
     <input type="password" inputmode="numeric" autocomplete="off" maxlength="8"><div class="pe"></div><div class="pb"><button class="cx">Cancel</button><button class="ok">OK</button></div></div>`;
@@ -1082,8 +1082,8 @@ function askPin(side, done){
       const r=await sb.rpc("golf_check_pin",{p_pin:v});
       if (r.error) throw r.error;
       const sd=r.data;
-      if (sd==null || (side>=0 && sd!==side)){ err.textContent="Wrong PIN"; inp.value=""; return; }
-      setPin(sd, v); close(); done && done();
+      if (sd==null || (side>=0 && sd!==side*2+m)){ err.textContent="Wrong PIN"; inp.value=""; return; }
+      setPin(sd>>1, sd&1, v); close(); done && done();
     }catch(e){ err.textContent="No connection – try again"; }
   };
   bg.querySelector(".ok").onclick=go;
@@ -1111,7 +1111,7 @@ async function liveLoad(key){
     const mine=localRows(key).filter(r=>!seen.has(`${r.match}-${r.hole}-${r.side}-${r.player}`));   // scores entered offline on this phone
     if (st.data && st.data.data) applySettings(st.data.data); else await pushSettings();
     RC.m.forEach(m=>m.scores={}); server.forEach(r=>setScore(r, r.score)); mine.forEach(r=>setScore(r, r.score));
-    for (const r of mine){ const pin=getPin(r.side); if (pin) await sb.rpc("golf_set_score",{p_pin:pin, p_course:key, p_match:r.match, p_hole:r.hole, p_side:r.side, p_player:r.player, p_score:r.score}); }
+    for (const r of mine){ const pin=getPin(r.side, r.match); if (pin) await sb.rpc("golf_set_score",{p_pin:pin, p_course:key, p_match:r.match, p_hole:r.hole, p_side:r.side, p_player:r.player, p_score:r.score}); }
     liveState="live"; liveRefresh(); liveSubscribe(key);
   }catch(e){ liveState="error"; renderRC(); }
 }
@@ -1130,15 +1130,15 @@ function liveSubscribe(key){
 async function liveWrite(mi, side, player, hole, v){
   if (!sbInit()) return;
   try{
-    const r = await sb.rpc("golf_set_score",{p_pin:getPin(side), p_course:RC_KEY, p_match:mi, p_hole:hole, p_side:side, p_player:player, p_score:v});
+    const r = await sb.rpc("golf_set_score",{p_pin:getPin(side,mi), p_course:RC_KEY, p_match:mi, p_hole:hole, p_side:side, p_player:player, p_score:v});
     if (r.error) throw r.error; if (liveState!=="live"){ liveState="live"; renderRC(); }
   }catch(e){
-    if (/PIN/i.test((e&&e.message)||"")){ setPin(side,null); toast("Wrong PIN – score not saved"); liveLoad(RC_KEY); return; }
+    if (/PIN/i.test((e&&e.message)||"")){ setPin(side,mi,null); toast("Wrong PIN – score not saved"); liveLoad(RC_KEY); return; }
     liveState="error"; renderRC(); toast("Not synced – saved on this phone"); }
 }
 async function liveClear(hole){
   if (!sbInit()) return;
-  try{ for (const sd of [0,1]){ const pin=getPin(sd); if (!pin) continue; const r=await sb.rpc("golf_clear",{p_pin:pin, p_course:RC_KEY, p_hole:hole}); if (r.error) throw r.error; } }catch(e){ liveState="error"; renderRC(); }
+  try{ for (const sd of [0,1,2,3]){ const pin=getPin(sd>>1, sd&1); if (!pin) continue; const r=await sb.rpc("golf_clear",{p_pin:pin, p_course:RC_KEY, p_hole:hole}); if (r.error) throw r.error; } }catch(e){ liveState="error"; renderRC(); }
 }
 let setTimer=null;
 function pushSettings(){ if (!sbInit()) return Promise.resolve(); clearTimeout(setTimer);
@@ -1235,10 +1235,10 @@ document.getElementById("rc").addEventListener("click", e=>{
   const b=e.target.closest("[data-act]"); if (!b) return;
   e.stopPropagation();
   const act=b.dataset.act, hole=state.hole+1;
-  if ((act==="inc"||act==="dec") && sbInit() && !getPin(+b.dataset.s)){
+  if ((act==="inc"||act==="dec") && sbInit() && !getPin(+b.dataset.s, +b.dataset.m)){
     const sel=`#rc [data-act="${act}"][data-m="${b.dataset.m}"][data-s="${b.dataset.s}"][data-p="${b.dataset.p}"]`;
-    askPin(+b.dataset.s, ()=>{ const nb=document.querySelector(sel); if (nb) nb.click(); }); return; }
-  if (act==="setup" && !RC.setup && sbInit() && !anyPin()){ askPin(-1, ()=>{ const nb=document.querySelector('#rc [data-act="setup"]'); if (nb) nb.click(); }); return; }
+    askPin(+b.dataset.s, +b.dataset.m, ()=>{ const nb=document.querySelector(sel); if (nb) nb.click(); }); return; }
+  if (act==="setup" && !RC.setup && sbInit() && !anyPin()){ askPin(-1, 0, ()=>{ const nb=document.querySelector('#rc [data-act="setup"]'); if (nb) nb.click(); }); return; }
   if (act==="toggle"){ if (RC.single && (RC.count||1)===1) RC.det=!RC.det; else RC.open=!RC.open; }
   else if (act==="setup"){ RC.setup=!RC.setup; }
   else if (act==="count"){ RC.count=+b.dataset.c; pushSettings(); }
