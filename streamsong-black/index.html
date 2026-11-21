@@ -163,6 +163,10 @@
   .day .res{margin-top:8px;font-size:12.5px;font-weight:600}
   .day .go{position:absolute;right:14px;bottom:12px;font-size:22px;font-weight:700;color:var(--navy)}
   .hdrlink{align-self:center;margin:4px 6px 0;flex:none;white-space:nowrap;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;text-decoration:none;letter-spacing:.02em;text-transform:none}
+  .rfbtn{margin-left:auto;margin-right:0}
+  .homebtn{white-space:nowrap;flex:none}
+  #h-kicker{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media (max-width:400px){ .rfw{display:none} }
   .homebtn{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:4px 10px;font:600 11px Inter,Arial,sans-serif;cursor:pointer;margin-right:8px;letter-spacing:.02em}
   #print{display:none}
   @media print{
@@ -188,13 +192,13 @@
 </head>
 <body>
 <div id="home" class="wrap">
-  <div class="home-hero"><img class="herobadge" src="img/wider-cup-256.png" alt="Wider Cup badge"><div class="kicker">Wider Cup · Streamsong 2026</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
+  <div class="home-hero" style="position:relative"><button class="homebtn rfbtn" data-refresh="1" aria-label="Refresh" style="position:absolute;top:12px;right:12px">⟳ Refresh</button><img class="herobadge" src="img/wider-cup-256.png" alt="Wider Cup badge"><div class="kicker">Wider Cup · Streamsong 2026</div><h1>THREE DAYS, THREE COURSES</h1><p>Pick the day to open its hole-by-hole safe-play guide and the team scoring for that round.</p></div>
   <div class="days" id="days"></div>
   <footer>Each day keeps its own scores on this phone. Course data: official and published scorecards; hole notes from the field guide (Black) and published reviews (Bone Valley, Blue).</footer>
 </div>
 <div id="screen" class="wrap">
   <header>
-    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Wider Cup / Streamsong Black</span></div>
+    <div class="kicker" style="display:flex;align-items:center"><button class="homebtn" data-home="1">‹ All days</button><span id="h-kicker">Wider Cup / Streamsong Black</span><button class="homebtn rfbtn" data-refresh="1" aria-label="Refresh">⟳<span class="rfw"> Refresh</span></button></div>
     <div class="titlerow">
       <img class="hbadge" src="img/wider-cup-256.png" alt="">
       <h1 id="h-title">HOLE 01</h1>
@@ -1271,6 +1275,7 @@ document.addEventListener("keydown", e=>{ if (e.key==="Escape") exitVidFs(); });
 function go(i){ vidOpen=false; exitVidFs(); state.view="course"; state.hole=(i+18)%18; const tag=state.course+"-hole-"+(state.hole+1); try{ history.replaceState(null,"","#"+tag); }catch(e){ location.hash=tag; } render(); window.scrollTo(0,0); }
 function goHome(){ state.view="home"; try{ history.replaceState(null,"","#home"); }catch(e){ location.hash="home"; } render(); window.scrollTo(0,0); }
 document.addEventListener("click", e=>{
+  const rb=e.target.closest("[data-refresh]"); if (rb){ rb.textContent="⟳ Loading…"; const u=location.pathname+"?v="+Date.now()+location.hash; location.replace(u); return; }
   const hb=e.target.closest("[data-home]"); if (hb){ goHome(); return; }
   const cb=e.target.closest("[data-course]"); if (cb){ setCourse(cb.dataset.course); state.hole=0; go(0); return; }
   const t=e.target.closest("[data-tee]"); if (t){ state.tee=t.dataset.tee; render(); return; }
