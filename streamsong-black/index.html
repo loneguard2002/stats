@@ -577,7 +577,7 @@ const COURSES = {
     link:()=>"https://www.streamsongresort.com/content/uploads/2026/10/Bone-Valley-Scorecard-2026.pdf", linkTitle:"Official scorecard (PDF)", linkSub:"streamsongresort.com – yardages, par and stroke index",
     foot:"Bone Valley only opened in 2026, so there is no yardage book online yet. Pars, yardages and stroke index are from the official scorecard; hole notes come from published reviews, and where none exist the plan is generic. Maps are schematic. The greens are the smallest at Streamsong, with false fronts, side banks, kicker slopes and backstops – aim away from tight flags and let the slopes feed the ball, and most fairways turn gently left.",
     holes:BONE_HOLES,
-    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] } } },
+    video:{ id:"hmgCUcVgz9U", seg:{ 1:[12,38] }, chop:{ 1:"rIaPjLVgxDXxf_gNbIoDL" } } },
   blue:{ key:"blue", name:"Blue", full:"Streamsong Blue", day:3, date:"2026-11-22", label:"Sun 22 Nov", designer:"Tom Doak · opened 2012", par:72, len:"6,692 yd from the Black tees",
     link:()=>"https://www.golfpass.com/courses/32311-streamsong-resort-blue-course/scorecard-and-layout", linkTitle:"Full scorecard", linkSub:"golfpass.com – all tees and stroke index",
     foot:"Pars, yardages and stroke index are from the published scorecard; hole notes come from in-depth hole-by-hole reviews. Maps are schematic, so hazard positions are indicative. Doak's greens are big and bold – leave the ball below the hole.",
@@ -1116,8 +1116,15 @@ let vidOpen=false;
 const fmtT=t=>`${Math.floor(t/60)}:${String(t%60).padStart(2,"0")}`;
 function renderVideo(C,h){
   const el=document.getElementById("vid"); const v=C.video, seg=v&&v.seg[h.n];
-  if (!seg){ el.innerHTML=""; return; }
-  const yt=`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`;
+  const chop=v&&v.chop&&v.chop[h.n];
+  if (!seg && !chop){ el.innerHTML=""; return; }
+  const yt=seg?`https://www.youtube.com/watch?v=${v.id}&t=${seg[0]}s`:`https://www.youtube.com/watch?v=${v.id}`;
+  if (chop){
+    el.innerHTML=`<div class="lbl" style="margin:10px 12px 4px">Hole ${h.n} video overview</div>
+      <div style="margin:0 10px;border-radius:10px;overflow:hidden"><div style="position:relative;width:100%;padding-top:70.54%;overflow:hidden;background:#000"><iframe src="https://tubechop.com/videos/${chop}/embed" title="${C.full} - Hole ${h.n}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block"></iframe></div></div>
+      <div class="vlinks"><span style="color:var(--muted)">${seg?`Clip ${fmtT(seg[0])}–${fmtT(seg[1])}`:""}</span><a href="${yt}" target="_blank" rel="noopener">Open in YouTube</a></div>`;
+    return;
+  }
   if (!vidOpen){
     el.innerHTML=`<button class="vbtn" data-vid="open"><span class="pl">▶</span><span>Watch hole ${h.n} overview<small>Video clip ${fmtT(seg[0])}–${fmtT(seg[1])} · ${seg[1]-seg[0]} seconds</small></span></button>`;
   } else {
