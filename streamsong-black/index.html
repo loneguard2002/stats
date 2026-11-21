@@ -37,9 +37,9 @@
   .holes button.traced::after{content:"";position:absolute;right:1px;top:1px;width:8px;height:8px;border-radius:50%;background:var(--safe);border:1.5px solid #fff}
   .controls{padding:8px 12px 6px;border-bottom:1px solid var(--line)}
   .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:4px 2px 5px}
-  .chips{display:flex;gap:4px;flex-wrap:wrap}
-  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 8px;font:600 12px Inter,Arial,sans-serif;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:5px}
-  .chip .dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+  .chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 2px;font:600 11.5px Inter,Arial,sans-serif;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;min-width:0;letter-spacing:-.01em}
+  .chip .dot{flex:none;width:9px;height:9px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
   .chip span.y{font-weight:500;color:var(--muted)}
   .chip[aria-pressed=true]{border-color:var(--navy);background:var(--navy);color:#fff}
   .chip[aria-pressed=true] span.y{color:#b9c8d6}
